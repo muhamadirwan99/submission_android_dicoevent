@@ -126,7 +126,9 @@ class HomeFragment : Fragment() {
             searchView.addTransitionListener { _, _, newState ->
                 if (newState == SearchView.TransitionState.HIDDEN) {
                     searchAdapter.submitList(emptyList())
-                    searchView.setText("")
+                    tvEmptySearch.visibility = View.GONE
+                    rvSearchResults.visibility = View.VISIBLE
+                    searchBar.setText("")
                 }
             }
         }
