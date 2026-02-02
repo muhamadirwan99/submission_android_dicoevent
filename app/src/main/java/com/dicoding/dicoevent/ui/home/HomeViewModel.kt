@@ -24,10 +24,10 @@ class HomeViewModel : ViewModel() {
     }
 
     init {
-        getListEvents()
+        getListFinishedEvents()
     }
 
-    private fun getListEvents() {
+    private fun getListFinishedEvents() {
         _isLoading.value = true
 
         val client = ApiConfig.getApiService().getDoneEvents()
@@ -42,7 +42,11 @@ class HomeViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
-                        _events.value = responseBody.listEvents
+                        if (responseBody.listEvents.size > 5) {
+                            _events.value = responseBody.listEvents.subList(0, 5)
+                        } else {
+                            _events.value = responseBody.listEvents
+                        }
                     }
                 } else {
                     _isLoading.value = false

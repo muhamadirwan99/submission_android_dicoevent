@@ -17,9 +17,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val homeViewModel by viewModels<HomeViewModel>()
 
-    companion object {
-        private const val TAG = "HomeFragment"
-    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,14 +47,8 @@ class HomeFragment : Fragment() {
 
     private fun setEventData(eventsData: List<ListEventsItem>) {
         val adapter = HomeListFinishedAdapter()
-        // 1. Inisialisasi sebagai ArrayList (Wadah yang bisa diedit)
-        val listData = ArrayList<ListEventsItem>()
 
-        // 2. Masukkan semua data dari parameter ke dalam listData
-        listData.addAll(eventsData)
-        listData.addAll(eventsData)
-
-        adapter.submitList(listData)
+        adapter.submitList(eventsData)
         binding.rvFinishedEvents.adapter = adapter
     }
 
