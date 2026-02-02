@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.dicoding.dicoevent.data.response.EventResponse
 import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.data.retrofit.ApiConfig
+import com.dicoding.dicoevent.util.Event
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,6 +32,9 @@ class HomeViewModel : ViewModel() {
     private val _isLoadingSearch = MutableLiveData<Boolean>(false)
     val isLoadingSearch: LiveData<Boolean> = _isLoadingSearch
 
+    private val _snackbarText = MutableLiveData<Event<String>>()
+    val snackbarText: LiveData<Event<String>> = _snackbarText
+
     companion object {
         private const val TAG = "HomeViewModel"
     }
@@ -42,36 +46,32 @@ class HomeViewModel : ViewModel() {
 
     private fun getListFinishedEvents() {
         _isLoadingFinished.value = true
-
         val client = ApiConfig.getApiService().getDoneEvents()
 
         client.enqueue(object : Callback<EventResponse> {
-            override fun onResponse(
-                call: Call<EventResponse?>,
-                response: Response<EventResponse?>
-            ) {
+            override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
                 _isLoadingFinished.value = false
-
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
-                        if (responseBody.listEvents.size > 5) {
-                            _finishedEvents.value = responseBody.listEvents.subList(0, 5)
-                        } else {
-                            _finishedEvents.value = responseBody.listEvents
-                        }
+                        _finishedEvents.value = responseBody.listEvents.take(5)
                     }
                 } else {
-                    _isLoadingFinished.value = false
+                    _snackbarText.value = Event("Failed to fetch data: ${response.message()}")
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
 
-            override fun onFailure(
-                call: Call<EventResponse?>,
-                t: Throwable
-            ) {
+            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
                 _isLoadingFinished.value = false
+
+                val errorMessage = when (t) {
+                    is java.net.UnknownHostException -> "No internet connection"
+                    is java.net.SocketTimeoutException -> "Connection timed out"
+                    else -> "onFailure: ${t.message}"
+                }
+
+                _snackbarText.value = Event(errorMessage)
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
@@ -79,73 +79,73 @@ class HomeViewModel : ViewModel() {
 
     private fun getListUpcomingEvents() {
         _isLoadingUpcoming.value = true
-
         val client = ApiConfig.getApiService().getActiveEvents()
 
         client.enqueue(object : Callback<EventResponse> {
             override fun onResponse(
-                call: Call<EventResponse?>,
-                response: Response<EventResponse?>
+                call: Call<EventResponse>,
+                response: Response<EventResponse>
             ) {
                 _isLoadingUpcoming.value = false
-
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
-                        if (responseBody.listEvents.size > 5) {
-                            _upcomingEvents.value = responseBody.listEvents.subList(0, 5)
-                        } else {
-                            _upcomingEvents.value = responseBody.listEvents
-                        }
+                        _upcomingEvents.value = responseBody.listEvents.take(5)
                     }
                 } else {
-                    _isLoadingUpcoming.value = false
+                    _snackbarText.value = Event("Failed to fetch upcoming events: ${response.message()}")
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
 
-            override fun onFailure(
-                call: Call<EventResponse?>,
-                t: Throwable
-            ) {
+            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
                 _isLoadingUpcoming.value = false
+
+                val errorMessage = when (t) {
+                    is java.net.UnknownHostException -> "No internet connection"
+                    is java.net.SocketTimeoutException -> "Connection timed out"
+                    else -> "onFailure: ${t.message}"
+                }
+
+                _snackbarText.value = Event(errorMessage)
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
     }
 
-     fun searchEvents(query: String) {
+    fun searchEvents(query: String) {
         _isLoadingSearch.value = true
-
         val client = ApiConfig.getApiService().searchEvents(keyword = query)
 
         client.enqueue(object : Callback<EventResponse> {
             override fun onResponse(
-                call: Call<EventResponse?>,
-                response: Response<EventResponse?>
+                call: Call<EventResponse>,
+                response: Response<EventResponse>
             ) {
                 _isLoadingSearch.value = false
-
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
                         _searchEvents.value = responseBody.listEvents
                     }
                 } else {
-                    _isLoadingSearch.value = false
+                    _snackbarText.value = Event("Failed to search events: ${response.message()}")
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
 
-            override fun onFailure(
-                call: Call<EventResponse?>,
-                t: Throwable
-            ) {
+            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
                 _isLoadingSearch.value = false
+
+                val errorMessage = when (t) {
+                    is java.net.UnknownHostException -> "No internet connection"
+                    is java.net.SocketTimeoutException -> "Connection timed out"
+                    else -> "Search error: ${t.message}"
+                }
+
+                _snackbarText.value = Event(errorMessage)
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
     }
-
-
 }

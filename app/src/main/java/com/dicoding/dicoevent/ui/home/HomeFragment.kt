@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.databinding.FragmentHomeBinding
+import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
 import com.google.android.material.search.SearchView
 
 class HomeFragment : Fragment() {
@@ -108,6 +109,17 @@ class HomeFragment : Fragment() {
 
         homeViewModel.isLoadingSearch.observe(viewLifecycleOwner) { isLoading ->
             showLoadingSearch(isLoading)
+        }
+
+        homeViewModel.snackbarText.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { message ->
+
+                com.google.android.material.snackbar.Snackbar.make(
+                    binding.root,
+                    message,
+                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                ).show()
+            }
         }
     }
 

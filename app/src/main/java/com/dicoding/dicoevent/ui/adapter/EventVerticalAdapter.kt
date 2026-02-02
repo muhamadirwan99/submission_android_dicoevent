@@ -1,4 +1,4 @@
-package com.dicoding.dicoevent.ui.home
+package com.dicoding.dicoevent.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
