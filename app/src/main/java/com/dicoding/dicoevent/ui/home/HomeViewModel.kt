@@ -13,11 +13,17 @@ import retrofit2.Response
 
 class HomeViewModel : ViewModel() {
 
-    private val _events = MutableLiveData<List<ListEventsItem>>()
-    val events: LiveData<List<ListEventsItem>> = _events
+    private val _finishedEvents = MutableLiveData<List<ListEventsItem>>()
+    val finishedEvents: LiveData<List<ListEventsItem>> = _finishedEvents
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _upcomingEvents = MutableLiveData<List<ListEventsItem>>()
+    val upcomingEvents: LiveData<List<ListEventsItem>> = _upcomingEvents
+
+    private val _isLoadingFinished = MutableLiveData<Boolean>()
+    val isLoadingFinished: LiveData<Boolean> = _isLoadingFinished
+
+    private val _isLoadingUpcoming = MutableLiveData<Boolean>()
+    val isLoadingUpcoming: LiveData<Boolean> = _isLoadingUpcoming
 
     companion object {
         private const val TAG = "HomeViewModel"
@@ -25,10 +31,11 @@ class HomeViewModel : ViewModel() {
 
     init {
         getListFinishedEvents()
+        getListUpcomingEvents()
     }
 
     private fun getListFinishedEvents() {
-        _isLoading.value = true
+        _isLoadingFinished.value = true
 
         val client = ApiConfig.getApiService().getDoneEvents()
 
@@ -37,19 +44,19 @@ class HomeViewModel : ViewModel() {
                 call: Call<EventResponse?>,
                 response: Response<EventResponse?>
             ) {
-                _isLoading.value = false
+                _isLoadingFinished.value = false
 
                 if (response.isSuccessful) {
                     val responseBody = response.body()
                     if (responseBody != null) {
                         if (responseBody.listEvents.size > 5) {
-                            _events.value = responseBody.listEvents.subList(0, 5)
+                            _finishedEvents.value = responseBody.listEvents.subList(0, 5)
                         } else {
-                            _events.value = responseBody.listEvents
+                            _finishedEvents.value = responseBody.listEvents
                         }
                     }
                 } else {
-                    _isLoading.value = false
+                    _isLoadingFinished.value = false
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
@@ -58,11 +65,47 @@ class HomeViewModel : ViewModel() {
                 call: Call<EventResponse?>,
                 t: Throwable
             ) {
-                _isLoading.value = false
+                _isLoadingFinished.value = false
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
+    }
 
+    private fun getListUpcomingEvents() {
+        _isLoadingUpcoming.value = true
+
+        val client = ApiConfig.getApiService().getActiveEvents()
+
+        client.enqueue(object : Callback<EventResponse> {
+            override fun onResponse(
+                call: Call<EventResponse?>,
+                response: Response<EventResponse?>
+            ) {
+                _isLoadingUpcoming.value = false
+
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    if (responseBody != null) {
+                        if (responseBody.listEvents.size > 5) {
+                            _upcomingEvents.value = responseBody.listEvents.subList(0, 5)
+                        } else {
+                            _upcomingEvents.value = responseBody.listEvents
+                        }
+                    }
+                } else {
+                    _isLoadingUpcoming.value = false
+                    Log.e(TAG, "onFailure: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(
+                call: Call<EventResponse?>,
+                t: Throwable
+            ) {
+                _isLoadingUpcoming.value = false
+                Log.e(TAG, "onFailure: ${t.message}")
+            }
+        })
     }
 
 

@@ -8,4 +8,6 @@
     <string name="dicoding_event">Dicoding Event</string>
     <string name="finished_events">Finished Events</string>
     <string name="image_cover_event">Image cover event</string>
+    <string name="upcoming_events">Upcoming Events</string>
+    <string name="register">Register</string>
 </resources>

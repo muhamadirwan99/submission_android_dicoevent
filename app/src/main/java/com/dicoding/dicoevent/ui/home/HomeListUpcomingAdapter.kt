@@ -1,7 +1,6 @@
 package com.dicoding.dicoevent.ui.home
 
 import android.view.LayoutInflater
-import android.view.RoundedCorner
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
@@ -11,15 +10,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.dicoding.dicoevent.data.response.ListEventsItem
-import com.dicoding.dicoevent.databinding.ItemRowEventBinding
-import com.dicoding.dicoevent.util.formatDateForDisplay
+import com.dicoding.dicoevent.databinding.ItemHorizontalEventBinding
 
-class HomeListFinishedAdapter : ListAdapter<ListEventsItem, HomeListFinishedAdapter.MyViewHolder>(DIFF_CALLBACK) {
+class HomeListUpcomingAdapter : ListAdapter<ListEventsItem, HomeListUpcomingAdapter.MyViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): MyViewHolder {
-        val binding = ItemRowEventBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemHorizontalEventBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(binding)
     }
 
@@ -31,16 +29,16 @@ class HomeListFinishedAdapter : ListAdapter<ListEventsItem, HomeListFinishedAdap
         holder.bind(event)
     }
 
-    class MyViewHolder(val binding: ItemRowEventBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MyViewHolder(val binding: ItemHorizontalEventBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(event: ListEventsItem) {
-            binding.tvItemTitle.text = event.name
-            binding.tvItemDate.text = event.beginTime?.formatDateForDisplay()
-            binding.tvItemPlace.text = event.cityName
-
             Glide.with(itemView.context)
                 .load(event.imageLogo)
                 .transform(CenterCrop(), RoundedCorners(16))
                 .into(binding.imgItemPhoto)
+
+            binding.btnRegister.setOnClickListener {
+                Toast.makeText(itemView.context, "Registered for ${event.name}", Toast.LENGTH_SHORT).show()
+            }
 
             itemView.setOnClickListener {
                 Toast.makeText(itemView.context, event.name, Toast.LENGTH_SHORT).show()

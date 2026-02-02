@@ -10,11 +10,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/item_event_placeholder" />
-        <include layout="@layout/item_event_placeholder" />
-        <include layout="@layout/item_event_placeholder" />
-        <include layout="@layout/item_event_placeholder" />
-        <include layout="@layout/item_event_placeholder" />
+        <include layout="@layout/item_shimmer_finished" />
+        <include layout="@layout/item_shimmer_finished" />
+        <include layout="@layout/item_shimmer_finished" />
+        <include layout="@layout/item_shimmer_finished" />
+        <include layout="@layout/item_shimmer_finished" />
 
     </LinearLayout>
 
