@@ -1,7 +1,6 @@
 package com.dicoding.dicoevent.ui.home
 
 import android.view.LayoutInflater
-import android.view.RoundedCorner
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
@@ -10,11 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.dicoding.dicoevent.R
 import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.databinding.ItemRowEventBinding
 import com.dicoding.dicoevent.util.formatDateForDisplay
 
-class HomeListFinishedAdapter : ListAdapter<ListEventsItem, HomeListFinishedAdapter.MyViewHolder>(DIFF_CALLBACK) {
+class EventVerticalAdapter : ListAdapter<ListEventsItem, EventVerticalAdapter.MyViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -39,7 +40,10 @@ class HomeListFinishedAdapter : ListAdapter<ListEventsItem, HomeListFinishedAdap
 
             Glide.with(itemView.context)
                 .load(event.imageLogo)
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.baseline_broken_image_24)
                 .transform(CenterCrop(), RoundedCorners(16))
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(binding.imgItemPhoto)
 
             itemView.setOnClickListener {

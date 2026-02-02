@@ -19,11 +19,17 @@ class HomeViewModel : ViewModel() {
     private val _upcomingEvents = MutableLiveData<List<ListEventsItem>>()
     val upcomingEvents: LiveData<List<ListEventsItem>> = _upcomingEvents
 
+    private val _searchEvents = MutableLiveData<List<ListEventsItem>>()
+    val searchEvents: LiveData<List<ListEventsItem>> = _searchEvents
+
     private val _isLoadingFinished = MutableLiveData<Boolean>()
     val isLoadingFinished: LiveData<Boolean> = _isLoadingFinished
 
     private val _isLoadingUpcoming = MutableLiveData<Boolean>()
     val isLoadingUpcoming: LiveData<Boolean> = _isLoadingUpcoming
+
+    private val _isLoadingSearch = MutableLiveData<Boolean>(false)
+    val isLoadingSearch: LiveData<Boolean> = _isLoadingSearch
 
     companion object {
         private const val TAG = "HomeViewModel"
@@ -103,6 +109,39 @@ class HomeViewModel : ViewModel() {
                 t: Throwable
             ) {
                 _isLoadingUpcoming.value = false
+                Log.e(TAG, "onFailure: ${t.message}")
+            }
+        })
+    }
+
+     fun searchEvents(query: String) {
+        _isLoadingSearch.value = true
+
+        val client = ApiConfig.getApiService().searchEvents(keyword = query)
+
+        client.enqueue(object : Callback<EventResponse> {
+            override fun onResponse(
+                call: Call<EventResponse?>,
+                response: Response<EventResponse?>
+            ) {
+                _isLoadingSearch.value = false
+
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
+                    if (responseBody != null) {
+                        _searchEvents.value = responseBody.listEvents
+                    }
+                } else {
+                    _isLoadingSearch.value = false
+                    Log.e(TAG, "onFailure: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(
+                call: Call<EventResponse?>,
+                t: Throwable
+            ) {
+                _isLoadingSearch.value = false
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })

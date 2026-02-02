@@ -10,4 +10,6 @@
     <string name="image_cover_event">Image cover event</string>
     <string name="upcoming_events">Upcoming Events</string>
     <string name="register">Register</string>
+    <string name="search_event">Search event...</string>
+    <string name="event_not_found">Event not found</string>
 </resources>
