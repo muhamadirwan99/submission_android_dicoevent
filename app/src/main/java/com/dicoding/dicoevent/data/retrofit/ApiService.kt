@@ -17,7 +17,7 @@ interface ApiService {
     fun getDoneEvents(): Call<EventResponse>
 
     // Get detail event by ID
-    @GET("event/{id}")
+    @GET("events/{id}")
     fun getDetailEvent(@Path("id") id: String): Call<DetailEventResponse>
 
     // Search events by name on all status events

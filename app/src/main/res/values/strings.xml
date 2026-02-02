@@ -5,4 +5,7 @@
     <string name="home">Home</string>
     <string name="upcoming">Upcoming</string>
     <string name="finished">Finished</string>
+    <string name="dicoding_event">Dicoding Event</string>
+    <string name="finished_events">Finished Events</string>
+    <string name="image_cover_event">Image cover event</string>
 </resources>

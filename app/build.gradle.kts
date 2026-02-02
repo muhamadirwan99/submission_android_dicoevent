@@ -45,6 +45,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    //Shimmer effect
+    implementation(libs.shimmer)
     //Image loading
     implementation(libs.glide)
     //Networking
