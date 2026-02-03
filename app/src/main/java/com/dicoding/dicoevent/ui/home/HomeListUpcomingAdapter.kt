@@ -2,7 +2,6 @@ package com.dicoding.dicoevent.ui.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +13,10 @@ import com.dicoding.dicoevent.R
 import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.databinding.ItemHorizontalEventBinding
 
-class HomeListUpcomingAdapter : ListAdapter<ListEventsItem, HomeListUpcomingAdapter.MyViewHolder>(DIFF_CALLBACK) {
+class HomeListUpcomingAdapter(
+    private val onItemClick: (Int) -> Unit,
+    private val onRegisterClick: (String) -> Unit
+) : ListAdapter<ListEventsItem, HomeListUpcomingAdapter.MyViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -28,11 +30,11 @@ class HomeListUpcomingAdapter : ListAdapter<ListEventsItem, HomeListUpcomingAdap
         position: Int
     ) {
         val event = getItem(position)
-        holder.bind(event)
+        holder.bind(event, onItemClick, onRegisterClick)
     }
 
     class MyViewHolder(val binding: ItemHorizontalEventBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(event: ListEventsItem) {
+        fun bind(event: ListEventsItem, onItemClick: (Int) -> Unit, onRegisterClick: (String) -> Unit) {
             Glide.with(itemView.context)
                 .load(event.imageLogo)
                 .placeholder(R.drawable.placeholder_image)
@@ -42,11 +44,11 @@ class HomeListUpcomingAdapter : ListAdapter<ListEventsItem, HomeListUpcomingAdap
                 .into(binding.imgItemPhoto)
 
             binding.btnRegister.setOnClickListener {
-                Toast.makeText(itemView.context, "Registered for ${event.name}", Toast.LENGTH_SHORT).show()
+                onRegisterClick(event.link ?: "")
             }
 
             itemView.setOnClickListener {
-                Toast.makeText(itemView.context, event.name, Toast.LENGTH_SHORT).show()
+                onItemClick(event.id ?: 0)
             }
         }
     }

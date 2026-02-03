@@ -7,9 +7,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.databinding.FragmentHomeBinding
 import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
@@ -60,7 +62,15 @@ class HomeFragment : Fragment() {
 
     private fun setupRecyclerViews() {
         finishedAdapter = EventVerticalAdapter()
-        upcomingAdapter = HomeListUpcomingAdapter()
+        upcomingAdapter = HomeListUpcomingAdapter(
+            onItemClick = { eventId ->
+                val action = HomeFragmentDirections.actionNavigationHomeToDetailActivity(eventId)
+                findNavController().navigate(action)
+            },
+            onRegisterClick = { link ->
+                Toast.makeText(requireContext(), "Register link: $link", Toast.LENGTH_SHORT).show()
+            }
+        )
         searchAdapter = EventVerticalAdapter()
 
         binding.rvFinishedEvents.apply {
@@ -128,7 +138,7 @@ class HomeFragment : Fragment() {
             searchView.setupWithSearchBar(searchBar)
             searchView
                 .editText
-                .setOnEditorActionListener { textView, actionId, event ->
+                .setOnEditorActionListener { _, _, _ ->
                     searchBar.setText(searchView.text)
                     homeViewModel.searchEvents(searchView.text.toString())
 
