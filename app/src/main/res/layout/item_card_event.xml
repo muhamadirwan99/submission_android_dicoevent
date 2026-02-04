@@ -18,9 +18,9 @@
             android:id="@+id/img_item_photo"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_gravity="top"
             android:contentDescription="@string/image_cover_event"
             android:scaleType="centerCrop"
-            android:layout_gravity="top"
             app:layout_constraintDimensionRatio="16:9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -124,10 +124,10 @@
 
             <ImageView
                 android:id="@+id/iv_organizer_logo"
-                android:src="@drawable/dicoding_logo"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginTop="16dp"
+                android:src="@drawable/dicoding_logo"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider"
                 tools:ignore="ContentDescription" />
@@ -170,7 +170,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                tools:progress="50"
                 app:indicatorColor="?attr/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -178,7 +177,8 @@
                 app:trackColor="#E0E0E0"
                 app:trackCornerRadius="16dp"
                 app:trackStopIndicatorSize="0dp"
-                app:trackThickness="7dp" />
+                app:trackThickness="7dp"
+                tools:progress="50" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

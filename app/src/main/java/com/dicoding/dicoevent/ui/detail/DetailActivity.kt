@@ -52,7 +52,7 @@ class DetailActivity : AppCompatActivity() {
     private fun observeViewModel() {
         detailViewModel.eventDetailState.observe(this) { state ->
             with(binding) {
-                shimmerLoading.shimmerViewContainer.isVisible = state is UiState.Loading
+                shimmerLoading.shimmerViewDetail.isVisible = state is UiState.Loading
                 layoutContent.root.isVisible = state is UiState.Success
                 layoutError.layoutError.isVisible = state is UiState.Error
                 actionRegister.isVisible = state is UiState.Success

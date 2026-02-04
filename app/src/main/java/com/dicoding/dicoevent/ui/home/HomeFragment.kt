@@ -20,6 +20,7 @@ import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.openUrl
 import com.dicoding.dicoevent.utils.textChangesAsFlow
 import com.google.android.material.search.SearchView
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -106,7 +107,7 @@ class HomeFragment : Fragment() {
         // === 1. UPCOMING SECTION ===
         homeViewModel.upcomingState.observe(viewLifecycleOwner) { state ->
             with(binding) {
-                shimmerUpcoming.shimmerViewContainer.isVisible = state is UiState.Loading
+                shimmerUpcoming.shimmerViewUpcoming.isVisible = state is UiState.Loading
                 rvUpcomingEvents.isVisible = state is UiState.Success
                 layoutErrorUpcoming.root.isVisible = state is UiState.Error
 
@@ -130,7 +131,7 @@ class HomeFragment : Fragment() {
         // === 2. FINISHED SECTION ===
         homeViewModel.finishedState.observe(viewLifecycleOwner) { state ->
             with(binding) {
-                shimmerFinished.shimmerViewContainer.isVisible = state is UiState.Loading
+                shimmerFinished.shimmerViewFinished.isVisible = state is UiState.Loading
                 rvFinishedEvents.isVisible = state is UiState.Success
                 layoutErrorFinished.root.isVisible = state is UiState.Error
 
@@ -154,7 +155,7 @@ class HomeFragment : Fragment() {
         // === 3. SEARCH SECTION ===
         homeViewModel.searchState.observe(viewLifecycleOwner) { state ->
             with(binding) {
-                shimmerSearch.shimmerViewContainer.isVisible = state is UiState.Loading
+                shimmerSearch.shimmerViewFinished.isVisible = state is UiState.Loading
 
                 if (state is UiState.Error) {
                     rvSearchResults.isVisible = false
@@ -172,6 +173,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @OptIn(FlowPreview::class)
     private fun setupSearch() {
         binding.searchView.setupWithSearchBar(binding.searchBar)
 

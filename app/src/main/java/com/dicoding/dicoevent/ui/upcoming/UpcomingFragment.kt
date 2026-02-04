@@ -20,6 +20,7 @@ import com.dicoding.dicoevent.utils.DisplayUtils
 import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.textChangesAsFlow
 import com.google.android.material.search.SearchView
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -89,7 +90,7 @@ class UpcomingFragment : Fragment() {
         // === 1. OBSERVE UPCOMING STATE ===
         viewModel.upcomingState.observe(viewLifecycleOwner) { state ->
             with(binding) {
-                shimmerUpcomingEvents.shimmerViewContainer.isVisible = state is UiState.Loading
+                shimmerUpcomingEvents.shimmerViewEvent.isVisible = state is UiState.Loading
                 rvUpcomingEvents.isVisible = state is UiState.Success
                 layoutError.root.isVisible = state is UiState.Error
 
@@ -113,7 +114,7 @@ class UpcomingFragment : Fragment() {
         // === 2. OBSERVE SEARCH STATE ===
         viewModel.searchState.observe(viewLifecycleOwner) { state ->
             with(binding) {
-                shimmerSearch.shimmerViewContainer.isVisible = state is UiState.Loading
+                shimmerSearch.shimmerViewFinished.isVisible = state is UiState.Loading
 
                 when (state) {
                     is UiState.Loading -> {
@@ -137,6 +138,7 @@ class UpcomingFragment : Fragment() {
         }
     }
 
+    @OptIn(FlowPreview::class)
     private fun setupSearch() {
         binding.searchView.setupWithSearchBar(binding.searchBar)
 
