@@ -15,7 +15,9 @@ import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.databinding.ItemRowEventBinding
 import com.dicoding.dicoevent.utils.formatDateForDisplay
 
-class EventVerticalAdapter : ListAdapter<ListEventsItem, EventVerticalAdapter.MyViewHolder>(DIFF_CALLBACK) {
+class EventVerticalAdapter(
+    private val onItemClick: (Int) -> Unit,
+) : ListAdapter<ListEventsItem, EventVerticalAdapter.MyViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -29,11 +31,11 @@ class EventVerticalAdapter : ListAdapter<ListEventsItem, EventVerticalAdapter.My
         position: Int
     ) {
         val event = getItem(position)
-        holder.bind(event)
+        holder.bind(event, onItemClick)
     }
 
     class MyViewHolder(val binding: ItemRowEventBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(event: ListEventsItem) {
+        fun bind(event: ListEventsItem, onItemClick: (Int) -> Unit) {
             binding.tvItemTitle.text = event.name
             binding.tvItemDate.text = event.beginTime?.formatDateForDisplay()
             binding.tvItemPlace.text = event.cityName
@@ -47,7 +49,7 @@ class EventVerticalAdapter : ListAdapter<ListEventsItem, EventVerticalAdapter.My
                 .into(binding.imgItemPhoto)
 
             itemView.setOnClickListener {
-                Toast.makeText(itemView.context, event.name, Toast.LENGTH_SHORT).show()
+                onItemClick(event.id ?: 0)
             }
         }
     }

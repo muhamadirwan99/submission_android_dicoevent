@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.databinding.FragmentHomeBinding
 import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
+import com.dicoding.dicoevent.utils.openUrl
 import com.google.android.material.search.SearchView
 
 class HomeFragment : Fragment() {
@@ -61,29 +62,38 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        finishedAdapter = EventVerticalAdapter()
+        val navigateToDetail: (Int) -> Unit = { eventId ->
+            val action = HomeFragmentDirections.actionNavigationHomeToDetailActivity(eventId)
+            findNavController().navigate(action)
+        }
+
+        finishedAdapter = EventVerticalAdapter(
+            onItemClick = navigateToDetail
+        )
         upcomingAdapter = HomeListUpcomingAdapter(
-            onItemClick = { eventId ->
-                val action = HomeFragmentDirections.actionNavigationHomeToDetailActivity(eventId)
-                findNavController().navigate(action)
-            },
+            onItemClick = navigateToDetail,
             onRegisterClick = { link ->
-                Toast.makeText(requireContext(), "Register link: $link", Toast.LENGTH_SHORT).show()
+                requireContext().openUrl(link)
             }
         )
-        searchAdapter = EventVerticalAdapter()
+        searchAdapter = EventVerticalAdapter(
+            onItemClick = navigateToDetail
 
-        binding.rvFinishedEvents.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = finishedAdapter
+        )
+
+        with(binding) {
+            rvFinishedEvents.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = finishedAdapter
+            }
+
+            rvUpcomingEvents.apply {
+                layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                adapter = upcomingAdapter
+            }
+
+            rvSearchResults.adapter = searchAdapter
         }
-
-        binding.rvUpcomingEvents.apply {
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-            adapter = upcomingAdapter
-        }
-
-        binding.rvSearchResults.adapter = searchAdapter
     }
 
     private fun observeViewModel() {
