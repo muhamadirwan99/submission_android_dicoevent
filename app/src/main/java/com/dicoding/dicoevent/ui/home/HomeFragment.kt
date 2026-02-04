@@ -67,22 +67,17 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        val navigateToDetail: (Int) -> Unit = { eventId ->
-            val action = HomeFragmentDirections.actionNavigationHomeToDetailActivity(eventId)
-            findNavController().navigate(action)
-        }
-
         finishedAdapter = EventVerticalAdapter(
-            onItemClick = navigateToDetail
+            onItemClick = ::navigateToDetailFinished
         )
         upcomingAdapter = HomeListUpcomingAdapter(
-            onItemClick = navigateToDetail,
+            onItemClick = ::navigateToDetail,
             onRegisterClick = { link ->
                 requireContext().openUrl(link)
             }
         )
         searchAdapter = EventVerticalAdapter(
-            onItemClick = navigateToDetail
+            onItemClick = ::navigateToDetail
         )
 
         with(binding) {
@@ -98,6 +93,16 @@ class HomeFragment : Fragment() {
 
             rvSearchResults.adapter = searchAdapter
         }
+    }
+
+    private fun navigateToDetail(eventId: Int) {
+        val action = HomeFragmentDirections.actionNavigationHomeToDetailActivity(eventId)
+        findNavController().navigate(action)
+    }
+
+    private fun navigateToDetailFinished(eventId: Int) {
+        val action = HomeFragmentDirections.actionNavigationHomeToDetailActivity(eventId, false)
+        findNavController().navigate(action)
     }
 
     private fun observeViewModel() {

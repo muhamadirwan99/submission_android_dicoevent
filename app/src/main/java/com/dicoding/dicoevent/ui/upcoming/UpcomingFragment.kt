@@ -68,19 +68,12 @@ class UpcomingFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
-        val navigateToDetail: (Int) -> Unit = { eventId ->
-            val action = UpcomingFragmentDirections.actionNavigationUpcomingToDetailActivity(eventId)
-            findNavController().navigate(action)
-        }
-
         upcomingAdapter = EventHorizontalAdapter(
-            onItemClick = navigateToDetail,
-
-            )
+            onItemClick = ::navigateToDetail
+        )
 
         searchAdapter = EventVerticalAdapter(
-            onItemClick = navigateToDetail
-
+            onItemClick = ::navigateToDetail
         )
 
         with(binding) {
@@ -91,6 +84,11 @@ class UpcomingFragment : Fragment() {
 
             rvSearchResults.adapter = searchAdapter
         }
+    }
+
+    private fun navigateToDetail(eventId: Int) {
+        val action = UpcomingFragmentDirections.actionNavigationUpcomingToDetailActivity(eventId)
+        findNavController().navigate(action)
     }
 
     private fun observeViewModel() {
@@ -112,6 +110,7 @@ class UpcomingFragment : Fragment() {
                             viewModel.getListUpcomingEvents()
                         }
                     }
+
                     else -> {}
                 }
             }
