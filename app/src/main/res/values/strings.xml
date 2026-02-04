@@ -29,4 +29,6 @@
     <string name="description_goes_here">Description goes here...</string>
     <string name="registrants_format">%1$d / %2$d Registered</string>
     <string name="progress_percentage">%.1f%%</string>
+    <string name="retry">Retry</string>
+    <string name="error_icon">Error Icon</string>
 </resources>

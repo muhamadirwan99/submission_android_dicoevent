@@ -4,13 +4,20 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dicoding.dicoevent.data.response.EventResponse
 import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.data.retrofit.ApiConfig
+import com.dicoding.dicoevent.ui.detail.DetailViewModel
+import com.dicoding.dicoevent.ui.upcoming.UpcomingViewModel
 import com.dicoding.dicoevent.utils.EventUtil
+import com.dicoding.dicoevent.utils.UiState
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 class HomeViewModel : ViewModel() {
 
@@ -46,106 +53,83 @@ class HomeViewModel : ViewModel() {
 
     private fun getListFinishedEvents() {
         _isLoadingFinished.value = true
-        val client = ApiConfig.getApiService().getDoneEvents()
 
-        client.enqueue(object : Callback<EventResponse> {
-            override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
-                _isLoadingFinished.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        _finishedEvents.value = responseBody.listEvents.take(5)
-                    }
-                } else {
-                    _snackbarText.value = EventUtil("Failed to fetch data: ${response.message()}")
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
-            }
+        viewModelScope.launch {
+            try {
+                val response = ApiConfig.getApiService().getDoneEvents()
+                _finishedEvents.value = response.listEvents.take(5)
 
-            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
                 _isLoadingFinished.value = false
 
-                val errorMessage = when (t) {
-                    is java.net.UnknownHostException -> "No internet connection"
-                    is java.net.SocketTimeoutException -> "Connection timed out"
-                    else -> "onFailure: ${t.message}"
-                }
+            } catch (e: Exception) {
 
+                val errorMessage = when (e) {
+                    is UnknownHostException -> "Tidak ada koneksi internet"
+                    is SocketTimeoutException -> "Koneksi timeout, silakan coba lagi"
+                    else -> e.message ?: "Terjadi kesalahan yang tidak diketahui"
+                }
+                Log.e(TAG, "getListUpcomingEvents Failure: ${e.message}")
+                _isLoadingFinished.value = false
                 _snackbarText.value = EventUtil(errorMessage)
-                Log.e(TAG, "onFailure: ${t.message}")
+
             }
-        })
+        }
     }
 
     private fun getListUpcomingEvents() {
         _isLoadingUpcoming.value = true
-        val client = ApiConfig.getApiService().getActiveEvents()
+        viewModelScope.launch {
+            try {
+                val response = ApiConfig.getApiService().getActiveEvents()
+                _upcomingEvents.value = response.listEvents.take(5)
 
-        client.enqueue(object : Callback<EventResponse> {
-            override fun onResponse(
-                call: Call<EventResponse>,
-                response: Response<EventResponse>
-            ) {
-                _isLoadingUpcoming.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        _upcomingEvents.value = responseBody.listEvents.take(5)
-                    }
-                } else {
-                    _snackbarText.value = EventUtil("Failed to fetch upcoming events: ${response.message()}")
-                    Log.e(TAG, "onFailure: ${response.message()}")
+                _isLoadingFinished.value = false
+
+            } catch (e: Exception) {
+
+                val errorMessage = when (e) {
+                    is UnknownHostException -> "Tidak ada koneksi internet"
+                    is SocketTimeoutException -> "Koneksi timeout, silakan coba lagi"
+                    else -> e.message ?: "Terjadi kesalahan yang tidak diketahui"
                 }
-            }
-
-            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
-                _isLoadingUpcoming.value = false
-
-                val errorMessage = when (t) {
-                    is java.net.UnknownHostException -> "No internet connection"
-                    is java.net.SocketTimeoutException -> "Connection timed out"
-                    else -> "onFailure: ${t.message}"
-                }
-
+                Log.e(TAG, "getListUpcomingEvents Failure: ${e.message}")
+                _isLoadingFinished.value = false
                 _snackbarText.value = EventUtil(errorMessage)
-                Log.e(TAG, "onFailure: ${t.message}")
+
             }
-        })
+        }
+
     }
 
     fun searchEvents(query: String) {
+        if (query.isEmpty()) {
+            _searchEvents.value = emptyList()
+            return
+        }
+
         _isLoadingSearch.value = true
-        val client = ApiConfig.getApiService().searchEvents(keyword = query)
 
-        client.enqueue(object : Callback<EventResponse> {
-            override fun onResponse(
-                call: Call<EventResponse>,
-                response: Response<EventResponse>
-            ) {
-                _isLoadingSearch.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        _searchEvents.value = responseBody.listEvents
-                    }
-                } else {
-                    _snackbarText.value = EventUtil("Failed to search events: ${response.message()}")
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
-            }
 
-            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
+//        _searchState.value = UiState.Loading
+
+        viewModelScope.launch {
+            try {
+                val response = ApiConfig.getApiService().searchEvents(active = 1, keyword = query)
+//                _searchState.value = UiState.Success(response.listEvents)
+                _searchEvents.value = response.listEvents
+
                 _isLoadingSearch.value = false
 
-                val errorMessage = when (t) {
-                    is java.net.UnknownHostException -> "No internet connection"
-                    is java.net.SocketTimeoutException -> "Connection timed out"
-                    else -> "Search error: ${t.message}"
+            } catch (e: Exception) {
+                val errorMessage = when (e) {
+                    is UnknownHostException -> "Tidak ada koneksi internet"
+                    is SocketTimeoutException -> "Koneksi timeout saat mencari"
+                    else -> "Gagal mencari: ${e.message}"
                 }
-
+                Log.e(TAG, "searchEvents Failure: ${e.message}")
+                _isLoadingSearch.value = false
                 _snackbarText.value = EventUtil(errorMessage)
-                Log.e(TAG, "onFailure: ${t.message}")
             }
-        })
+        }
     }
 }

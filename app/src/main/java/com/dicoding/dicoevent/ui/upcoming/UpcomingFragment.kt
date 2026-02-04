@@ -18,6 +18,7 @@ import com.dicoding.dicoevent.ui.home.HomeFragmentDirections
 import com.dicoding.dicoevent.ui.home.HomeListUpcomingAdapter
 import com.dicoding.dicoevent.ui.home.HomeViewModel
 import com.dicoding.dicoevent.utils.DisplayUtils
+import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.openUrl
 import com.google.android.material.search.SearchView
 import kotlin.getValue
@@ -25,11 +26,10 @@ import kotlin.getValue
 
 class UpcomingFragment : Fragment() {
 
-    private lateinit var binding : FragmentUpcomingBinding
+    private lateinit var binding: FragmentUpcomingBinding
     private val viewModel by viewModels<UpcomingViewModel>()
     private lateinit var upcomingAdapter: EventHorizontalAdapter
     private lateinit var searchAdapter: EventVerticalAdapter
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,7 +67,7 @@ class UpcomingFragment : Fragment() {
         upcomingAdapter = EventHorizontalAdapter(
             onItemClick = navigateToDetail,
 
-        )
+            )
 
         searchAdapter = EventVerticalAdapter(
             onItemClick = navigateToDetail
@@ -85,40 +85,74 @@ class UpcomingFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.upcomingEvents.observe(viewLifecycleOwner) { events ->
-            upcomingAdapter.submitList(events)
-        }
+        viewModel.upcomingState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Loading -> {
+                    with(binding) {
+                        rvUpcomingEvents.visibility = View.GONE
+                        layoutError.layoutError.visibility = View.GONE
+                        shimmerUpcomingEvents.shimmerViewContainer.visibility = View.VISIBLE
+                    }
+                }
 
-        viewModel.isLoadingUpcoming.observe(viewLifecycleOwner) { isLoading ->
-            showLoadingUpcoming(isLoading)
-        }
+                is UiState.Success -> {
+                    with(binding) {
+                        rvUpcomingEvents.visibility = View.VISIBLE
+                        layoutError.layoutError.visibility = View.GONE
+                        shimmerUpcomingEvents.shimmerViewContainer.visibility = View.GONE
+                    }
 
-        viewModel.searchEvents.observe(viewLifecycleOwner) { events ->
-            searchAdapter.submitList(events)
+                    upcomingAdapter.submitList(state.data)
+                }
 
-            with(binding)  {
-                if (events.isEmpty()) {
-                    tvEmptySearch.visibility = View.VISIBLE
-                    rvSearchResults.visibility = View.GONE
-                } else {
-                    tvEmptySearch.visibility = View.GONE
-                    rvSearchResults.visibility = View.VISIBLE
+                is UiState.Error -> {
+                    with(binding) {
+                        rvUpcomingEvents.visibility = View.GONE
+                        shimmerUpcomingEvents.shimmerViewContainer.visibility = View.GONE
+                        layoutError.layoutError.visibility = View.VISIBLE
+                        layoutError.tvErrorMessage.text = state.errorMessage
+                        layoutError.btnRetry.setOnClickListener {
+                            viewModel.getListUpcomingEvents()
+                        }
+                    }
                 }
             }
         }
 
-        viewModel.isLoadingSearch.observe(viewLifecycleOwner) { isLoading ->
-            showLoadingSearch(isLoading)
-        }
+        viewModel.searchState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Loading -> {
+                    with(binding) {
+                        rvSearchResults.visibility = View.GONE
+                        shimmerSearch.shimmerViewContainer.visibility = View.VISIBLE
+                        tvEmptySearch.visibility = View.GONE
+                    }
+                }
 
-        viewModel.snackbarText.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { message ->
+                is UiState.Success -> {
+                    with(binding) {
+                        if (state.data.isEmpty()) {
+                            rvSearchResults.visibility = View.GONE
+                            shimmerSearch.shimmerViewContainer.visibility = View.GONE
+                            tvEmptySearch.visibility = View.VISIBLE
+                        }
 
-                com.google.android.material.snackbar.Snackbar.make(
-                    binding.root,
-                    message,
-                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-                ).show()
+                        rvSearchResults.visibility = View.VISIBLE
+                        shimmerSearch.shimmerViewContainer.visibility = View.GONE
+                        tvEmptySearch.visibility = View.GONE
+
+                        searchAdapter.submitList(state.data)
+                    }
+                }
+
+                is UiState.Error -> {
+                    with(binding) {
+                        rvSearchResults.visibility = View.GONE
+                        shimmerSearch.shimmerViewContainer.visibility = View.GONE
+                        tvEmptySearch.visibility = View.VISIBLE
+                    }
+                }
+
             }
         }
     }
@@ -144,15 +178,5 @@ class UpcomingFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun showLoadingUpcoming(isLoading: Boolean) {
-        val shimmerView = binding.shimmerUpcomingEvents.root
-        DisplayUtils.toggleLoading(isLoading, shimmerView, binding.rvUpcomingEvents)
-    }
-
-    private fun showLoadingSearch(isLoading: Boolean) {
-        val shimmerView = binding.shimmerSearch.root
-        DisplayUtils.toggleLoading(isLoading, shimmerView, binding.rvSearchResults)
     }
 }

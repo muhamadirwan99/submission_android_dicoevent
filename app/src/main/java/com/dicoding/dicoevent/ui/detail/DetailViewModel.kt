@@ -4,10 +4,14 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dicoding.dicoevent.data.response.DetailEventResponse
 import com.dicoding.dicoevent.data.response.EventDetail
 import com.dicoding.dicoevent.data.retrofit.ApiConfig
+import com.dicoding.dicoevent.ui.upcoming.UpcomingViewModel
 import com.dicoding.dicoevent.utils.EventUtil
+import com.dicoding.dicoevent.utils.UiState
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,34 +36,29 @@ class DetailViewModel : ViewModel() {
 
     fun getDetailEvent(id: Int) {
         _isLoading.value = true
-        val client = ApiConfig.getApiService().getDetailEvent(id)
 
-        client.enqueue(object : Callback<DetailEventResponse> {
-            override fun onResponse(call: Call<DetailEventResponse>, response: Response<DetailEventResponse>) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        _eventDetail.value = responseBody.eventDetail ?: EventDetail()
-                    }
-                } else {
-                    _snackbarText.value = EventUtil("Failed to fetch data: ${response.message()}")
-                    Log.e(TAG, "onFailure: ${response.message()}")
-                }
-            }
+        viewModelScope.launch {
+            try {
+                val response = ApiConfig.getApiService().getDetailEvent(id)
 
-            override fun onFailure(call: Call<DetailEventResponse>, t: Throwable) {
+//                _upcomingState.value = UiState.Success(response.listEvents)
+
                 _isLoading.value = false
 
-                val errorMessage = when (t) {
-                    is UnknownHostException -> "No internet connection"
-                    is SocketTimeoutException -> "Connection timed out"
-                    else -> "onFailure: ${t.message}"
-                }
+            } catch (e: Exception) {
 
+                val errorMessage = when (e) {
+                    is UnknownHostException -> "Tidak ada koneksi internet"
+                    is SocketTimeoutException -> "Koneksi timeout, silakan coba lagi"
+                    else -> e.message ?: "Terjadi kesalahan yang tidak diketahui"
+                }
+                Log.e(TAG, "getListUpcomingEvents Failure: ${e.message}")
+//                _upcomingState.value = UiState.Error(errorMessage)
+                _isLoading.value = false
                 _snackbarText.value = EventUtil(errorMessage)
-                Log.e(TAG, "onFailure: ${t.message}")
+
             }
-        })
+        }
+
     }
 }
