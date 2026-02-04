@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.databinding.FragmentFinishedBinding
 import com.dicoding.dicoevent.ui.adapter.EventHorizontalAdapter
 import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
-import com.dicoding.dicoevent.ui.home.HomeFragmentDirections
-import com.dicoding.dicoevent.ui.upcoming.UpcomingFragmentDirections
 import com.dicoding.dicoevent.utils.DisplayUtils
 import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.textChangesAsFlow
@@ -38,7 +36,7 @@ class FinishedFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentFinishedBinding.inflate(inflater, container, false)
         return binding.root
     }

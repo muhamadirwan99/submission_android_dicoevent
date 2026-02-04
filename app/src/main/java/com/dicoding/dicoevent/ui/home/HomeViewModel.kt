@@ -5,20 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dicoding.dicoevent.data.response.EventResponse
 import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.data.retrofit.ApiConfig
-import com.dicoding.dicoevent.ui.detail.DetailViewModel
-import com.dicoding.dicoevent.ui.upcoming.UpcomingViewModel
-import com.dicoding.dicoevent.utils.EventUtil
 import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 
 class HomeViewModel : ViewModel() {
 

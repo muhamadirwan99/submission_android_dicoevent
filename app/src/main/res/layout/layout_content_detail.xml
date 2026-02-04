@@ -271,7 +271,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:textStyle="italic"
-            tools:text="@string/summary" />
+            tools:text="This summary" />
 
     </com.google.android.material.card.MaterialCardView>
 

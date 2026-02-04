@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">DicoEvent</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="home">Home</string>
     <string name="upcoming">Upcoming</string>
     <string name="finished">Finished</string>
@@ -10,23 +9,21 @@
     <string name="image_cover_event">Image cover event</string>
     <string name="upcoming_events">Upcoming Events</string>
     <string name="register">REGISTER</string>
-    <string name="search_event">Search event...</string>
+    <string name="search_event">Search event…</string>
     <string name="event_not_found">Event not found</string>
     <string name="back">Back</string>
     <string name="background_event">Background Event</string>
-    <string name="summary">Acara ini sepenuhnya GRATIS dan akan diselenggarakan hari Jum\'at, 17 Mei 2024 pukul 16.00 - 17.00 WIB Live di YouTube</string>
     <string name="register_now">REGISTER NOW</string>
     <string name="quota_registrants">Quota Registrants</string>
     <string name="registrants">Registrants</string>
     <string name="date">Date</string>
-    <string name="time">Time</string>
     <string name="by">By Dicoding Event</string>
     <string name="title">DevCoach 151 : Front End | Hidup Lebih Simpel dengan Axios</string>
     <string name="category">SEMINAR</string>
     <string name="place">place</string>
     <string name="progress_registrants">478 / 2000</string>
     <string name="percentage">23.9%</string>
-    <string name="description_goes_here">Description goes here...</string>
+    <string name="description_goes_here">Description goes here…</string>
     <string name="registrants_format">%1$d / %2$d Registered</string>
     <string name="progress_percentage">%.1f%%</string>
     <string name="retry">Retry</string>
