@@ -65,12 +65,16 @@ class UpcomingViewModel : ViewModel() {
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                Log.e(TAG, "getListUpcomingEvents Failure: ${e.localizedMessage}")
+                Log.e(TAG, "getSearchEvents Failure: ${e.localizedMessage}")
 
                 val userMessage = e.toUserFriendlyMessage()
 
                 _searchState.value = UiState.Error(userMessage)
             }
         }
+    }
+
+    fun clearSearch() {
+        _searchState.value = UiState.Success(emptyList())
     }
 }

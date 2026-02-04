@@ -12,6 +12,7 @@ import com.dicoding.dicoevent.ui.detail.DetailViewModel
 import com.dicoding.dicoevent.ui.upcoming.UpcomingViewModel
 import com.dicoding.dicoevent.utils.EventUtil
 import com.dicoding.dicoevent.utils.UiState
+import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,26 +22,14 @@ import java.net.UnknownHostException
 
 class HomeViewModel : ViewModel() {
 
-    private val _finishedEvents = MutableLiveData<List<ListEventsItem>>()
-    val finishedEvents: LiveData<List<ListEventsItem>> = _finishedEvents
+    private val _finishedState = MutableLiveData<UiState<List<ListEventsItem>>>(UiState.Loading)
+    val finishedState: LiveData<UiState<List<ListEventsItem>>> = _finishedState
 
-    private val _upcomingEvents = MutableLiveData<List<ListEventsItem>>()
-    val upcomingEvents: LiveData<List<ListEventsItem>> = _upcomingEvents
+    private val _upcomingState = MutableLiveData<UiState<List<ListEventsItem>>>(UiState.Loading)
+    val upcomingState: LiveData<UiState<List<ListEventsItem>>> = _upcomingState
 
-    private val _searchEvents = MutableLiveData<List<ListEventsItem>>()
-    val searchEvents: LiveData<List<ListEventsItem>> = _searchEvents
-
-    private val _isLoadingFinished = MutableLiveData<Boolean>()
-    val isLoadingFinished: LiveData<Boolean> = _isLoadingFinished
-
-    private val _isLoadingUpcoming = MutableLiveData<Boolean>()
-    val isLoadingUpcoming: LiveData<Boolean> = _isLoadingUpcoming
-
-    private val _isLoadingSearch = MutableLiveData<Boolean>(false)
-    val isLoadingSearch: LiveData<Boolean> = _isLoadingSearch
-
-    private val _snackbarText = MutableLiveData<EventUtil<String>>()
-    val snackbarText: LiveData<EventUtil<String>> = _snackbarText
+    private val _searchState = MutableLiveData<UiState<List<ListEventsItem>>>(UiState.Success(emptyList()))
+    val searchState: LiveData<UiState<List<ListEventsItem>>> = _searchState
 
     companion object {
         private const val TAG = "HomeViewModel"
@@ -51,85 +40,71 @@ class HomeViewModel : ViewModel() {
         getListUpcomingEvents()
     }
 
-    private fun getListFinishedEvents() {
-        _isLoadingFinished.value = true
+    fun getListFinishedEvents() {
+        _finishedState.value = UiState.Loading
 
         viewModelScope.launch {
             try {
                 val response = ApiConfig.getApiService().getDoneEvents()
-                _finishedEvents.value = response.listEvents.take(5)
-
-                _isLoadingFinished.value = false
+                _finishedState.value = UiState.Success(response.listEvents.take(5))
 
             } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e(TAG, "getListFinishedEvents Failure: ${e.localizedMessage}")
 
-                val errorMessage = when (e) {
-                    is UnknownHostException -> "Tidak ada koneksi internet"
-                    is SocketTimeoutException -> "Koneksi timeout, silakan coba lagi"
-                    else -> e.message ?: "Terjadi kesalahan yang tidak diketahui"
-                }
-                Log.e(TAG, "getListUpcomingEvents Failure: ${e.message}")
-                _isLoadingFinished.value = false
-                _snackbarText.value = EventUtil(errorMessage)
+                val userMessage = e.toUserFriendlyMessage()
+
+                _finishedState.value = UiState.Error(userMessage)
 
             }
         }
     }
 
-    private fun getListUpcomingEvents() {
-        _isLoadingUpcoming.value = true
+    fun getListUpcomingEvents() {
+        _upcomingState.value = UiState.Loading
+
         viewModelScope.launch {
             try {
                 val response = ApiConfig.getApiService().getActiveEvents()
-                _upcomingEvents.value = response.listEvents.take(5)
-
-                _isLoadingFinished.value = false
+                _upcomingState.value = UiState.Success(response.listEvents.take(5))
 
             } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e(TAG, "getListUpcomingEvents Failure: ${e.localizedMessage}")
 
-                val errorMessage = when (e) {
-                    is UnknownHostException -> "Tidak ada koneksi internet"
-                    is SocketTimeoutException -> "Koneksi timeout, silakan coba lagi"
-                    else -> e.message ?: "Terjadi kesalahan yang tidak diketahui"
-                }
-                Log.e(TAG, "getListUpcomingEvents Failure: ${e.message}")
-                _isLoadingFinished.value = false
-                _snackbarText.value = EventUtil(errorMessage)
+                val userMessage = e.toUserFriendlyMessage()
+
+                _upcomingState.value = UiState.Error(userMessage)
 
             }
         }
-
     }
 
     fun searchEvents(query: String) {
         if (query.isEmpty()) {
-            _searchEvents.value = emptyList()
+            _searchState.value = UiState.Success(emptyList())
             return
         }
 
-        _isLoadingSearch.value = true
-
-
-//        _searchState.value = UiState.Loading
+        _searchState.value = UiState.Loading
 
         viewModelScope.launch {
             try {
-                val response = ApiConfig.getApiService().searchEvents(active = 1, keyword = query)
-//                _searchState.value = UiState.Success(response.listEvents)
-                _searchEvents.value = response.listEvents
-
-                _isLoadingSearch.value = false
+                val response = ApiConfig.getApiService().searchEvents(keyword = query)
+                _searchState.value = UiState.Success(response.listEvents)
 
             } catch (e: Exception) {
-                val errorMessage = when (e) {
-                    is UnknownHostException -> "Tidak ada koneksi internet"
-                    is SocketTimeoutException -> "Koneksi timeout saat mencari"
-                    else -> "Gagal mencari: ${e.message}"
-                }
-                Log.e(TAG, "searchEvents Failure: ${e.message}")
-                _isLoadingSearch.value = false
-                _snackbarText.value = EventUtil(errorMessage)
+                e.printStackTrace()
+                Log.e(TAG, "getSearchEvent Failure: ${e.localizedMessage}")
+
+                val userMessage = e.toUserFriendlyMessage()
+
+                _searchState.value = UiState.Error(userMessage)
             }
         }
+    }
+
+    fun clearSearch() {
+        _searchState.value = UiState.Success(emptyList())
     }
 }

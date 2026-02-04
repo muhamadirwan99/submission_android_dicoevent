@@ -1,13 +1,16 @@
 package com.dicoding.dicoevent.ui.upcoming
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.R
@@ -20,7 +23,13 @@ import com.dicoding.dicoevent.ui.home.HomeViewModel
 import com.dicoding.dicoevent.utils.DisplayUtils
 import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.openUrl
+import com.dicoding.dicoevent.utils.textChangesAsFlow
 import com.google.android.material.search.SearchView
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import kotlin.getValue
 
 
@@ -85,97 +94,74 @@ class UpcomingFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+        // === 1. OBSERVE UPCOMING STATE ===
         viewModel.upcomingState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is UiState.Loading -> {
-                    with(binding) {
-                        rvUpcomingEvents.visibility = View.GONE
-                        layoutError.layoutError.visibility = View.GONE
-                        shimmerUpcomingEvents.shimmerViewContainer.visibility = View.VISIBLE
-                    }
-                }
+            with(binding) {
+                shimmerUpcomingEvents.shimmerViewContainer.isVisible = state is UiState.Loading
+                rvUpcomingEvents.isVisible = state is UiState.Success
+                layoutError.root.isVisible = state is UiState.Error
 
-                is UiState.Success -> {
-                    with(binding) {
-                        rvUpcomingEvents.visibility = View.VISIBLE
-                        layoutError.layoutError.visibility = View.GONE
-                        shimmerUpcomingEvents.shimmerViewContainer.visibility = View.GONE
+                when (state) {
+                    is UiState.Success -> {
+                        upcomingAdapter.submitList(state.data)
                     }
 
-                    upcomingAdapter.submitList(state.data)
-                }
-
-                is UiState.Error -> {
-                    with(binding) {
-                        rvUpcomingEvents.visibility = View.GONE
-                        shimmerUpcomingEvents.shimmerViewContainer.visibility = View.GONE
-                        layoutError.layoutError.visibility = View.VISIBLE
+                    is UiState.Error -> {
                         layoutError.tvErrorMessage.text = state.errorMessage
                         layoutError.btnRetry.setOnClickListener {
                             viewModel.getListUpcomingEvents()
                         }
                     }
+                    else -> {}
                 }
             }
         }
 
+        // === 2. OBSERVE SEARCH STATE ===
         viewModel.searchState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is UiState.Loading -> {
-                    with(binding) {
-                        rvSearchResults.visibility = View.GONE
-                        shimmerSearch.shimmerViewContainer.visibility = View.VISIBLE
-                        tvEmptySearch.visibility = View.GONE
+            with(binding) {
+                shimmerSearch.shimmerViewContainer.isVisible = state is UiState.Loading
+
+                when (state) {
+                    is UiState.Loading -> {
+                        rvSearchResults.isVisible = false
+                        tvEmptySearch.isVisible = false
                     }
-                }
 
-                is UiState.Success -> {
-                    with(binding) {
-                        if (state.data.isEmpty()) {
-                            rvSearchResults.visibility = View.GONE
-                            shimmerSearch.shimmerViewContainer.visibility = View.GONE
-                            tvEmptySearch.visibility = View.VISIBLE
-                        }
-
-                        rvSearchResults.visibility = View.VISIBLE
-                        shimmerSearch.shimmerViewContainer.visibility = View.GONE
-                        tvEmptySearch.visibility = View.GONE
-
+                    is UiState.Success -> {
+                        val isDataEmpty = state.data.isEmpty()
+                        rvSearchResults.isVisible = !isDataEmpty
+                        tvEmptySearch.isVisible = isDataEmpty
                         searchAdapter.submitList(state.data)
                     }
-                }
 
-                is UiState.Error -> {
-                    with(binding) {
-                        rvSearchResults.visibility = View.GONE
-                        shimmerSearch.shimmerViewContainer.visibility = View.GONE
-                        tvEmptySearch.visibility = View.VISIBLE
+                    is UiState.Error -> {
+                        rvSearchResults.isVisible = false
+                        tvEmptySearch.isVisible = true
                     }
                 }
-
             }
         }
     }
 
     private fun setupSearch() {
-        with(binding) {
-            searchView.setupWithSearchBar(searchBar)
-            searchView
-                .editText
-                .setOnEditorActionListener { _, _, _ ->
-                    searchBar.setText(searchView.text)
-                    viewModel.searchEvents(searchView.text.toString())
+        binding.searchView.setupWithSearchBar(binding.searchBar)
 
-                    false
+        lifecycleScope.launch {
+            binding.searchView.editText.textChangesAsFlow()
+                .debounce(500)
+                .distinctUntilChanged()
+                .filter { it.isNotEmpty() }
+                .collect { query ->
+                    Log.d("Search", "Mencari: $query")
+                    viewModel.searchEvents(query)
                 }
+        }
 
-            searchView.addTransitionListener { _, _, newState ->
-                if (newState == SearchView.TransitionState.HIDDEN) {
-                    searchAdapter.submitList(emptyList())
-                    tvEmptySearch.visibility = View.GONE
-                    rvSearchResults.visibility = View.VISIBLE
-                    searchBar.setText("")
-                }
+        binding.searchView.addTransitionListener { _, _, newState ->
+            if (newState == SearchView.TransitionState.HIDDEN) {
+                binding.searchBar.setText("")
+                viewModel.clearSearch()
             }
         }
     }

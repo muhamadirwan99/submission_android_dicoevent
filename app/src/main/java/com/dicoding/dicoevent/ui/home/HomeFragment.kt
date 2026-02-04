@@ -3,6 +3,7 @@ package com.dicoding.dicoevent.ui.home
 import android.content.Context
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +11,22 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.databinding.FragmentHomeBinding
 import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
 import com.dicoding.dicoevent.utils.DisplayUtils
+import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.openUrl
+import com.dicoding.dicoevent.utils.textChangesAsFlow
 import com.google.android.material.search.SearchView
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -28,8 +37,7 @@ class HomeFragment : Fragment() {
     private lateinit var searchAdapter: EventVerticalAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
@@ -75,7 +83,6 @@ class HomeFragment : Fragment() {
         )
         searchAdapter = EventVerticalAdapter(
             onItemClick = navigateToDetail
-
         )
 
         with(binding) {
@@ -94,87 +101,94 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        homeViewModel.finishedEvents.observe(viewLifecycleOwner) { events ->
-            finishedAdapter.submitList(events)
-        }
-
-        homeViewModel.isLoadingFinished.observe(viewLifecycleOwner) { isLoading ->
-            showLoadingFinished(isLoading)
-        }
-
-        homeViewModel.upcomingEvents.observe(viewLifecycleOwner) { events ->
-            upcomingAdapter.submitList(events)
-        }
-
-        homeViewModel.isLoadingUpcoming.observe(viewLifecycleOwner) { isLoading ->
-            showLoadingUpcoming(isLoading)
-        }
-
-        homeViewModel.searchEvents.observe(viewLifecycleOwner) { events ->
-            searchAdapter.submitList(events)
-
+        // === 1. UPCOMING SECTION ===
+        homeViewModel.upcomingState.observe(viewLifecycleOwner) { state ->
             with(binding) {
-                if (events.isEmpty()) {
-                    tvEmptySearch.visibility = View.VISIBLE
-                    rvSearchResults.visibility = View.GONE
-                } else {
-                    tvEmptySearch.visibility = View.GONE
-                    rvSearchResults.visibility = View.VISIBLE
+                shimmerUpcoming.shimmerViewContainer.isVisible = state is UiState.Loading
+                rvUpcomingEvents.isVisible = state is UiState.Success
+                layoutErrorUpcoming.root.isVisible = state is UiState.Error
+
+                when (state) {
+                    is UiState.Success -> {
+                        upcomingAdapter.submitList(state.data)
+                    }
+
+                    is UiState.Error -> {
+                        layoutErrorUpcoming.tvErrorMessage.text = state.errorMessage
+                        layoutErrorUpcoming.btnRetry.setOnClickListener {
+                            homeViewModel.getListUpcomingEvents()
+                        }
+                    }
+
+                    else -> {}
                 }
             }
         }
 
-        homeViewModel.isLoadingSearch.observe(viewLifecycleOwner) { isLoading ->
-            showLoadingSearch(isLoading)
+        // === 2. FINISHED SECTION ===
+        homeViewModel.finishedState.observe(viewLifecycleOwner) { state ->
+            with(binding) {
+                shimmerFinished.shimmerViewContainer.isVisible = state is UiState.Loading
+                rvFinishedEvents.isVisible = state is UiState.Success
+                layoutErrorFinished.root.isVisible = state is UiState.Error
+
+                when (state) {
+                    is UiState.Success -> {
+                        finishedAdapter.submitList(state.data)
+                    }
+
+                    is UiState.Error -> {
+                        layoutErrorFinished.tvErrorMessage.text = state.errorMessage
+                        layoutErrorFinished.btnRetry.setOnClickListener {
+                            homeViewModel.getListFinishedEvents()
+                        }
+                    }
+
+                    else -> {}
+                }
+            }
         }
 
-        homeViewModel.snackbarText.observe(viewLifecycleOwner) { event ->
-            event.getContentIfNotHandled()?.let { message ->
+        // === 3. SEARCH SECTION ===
+        homeViewModel.searchState.observe(viewLifecycleOwner) { state ->
+            with(binding) {
+                shimmerSearch.shimmerViewContainer.isVisible = state is UiState.Loading
 
-                com.google.android.material.snackbar.Snackbar.make(
-                    binding.root,
-                    message,
-                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-                ).show()
+                if (state is UiState.Error) {
+                    rvSearchResults.isVisible = false
+                    tvEmptySearch.isVisible = true
+                }
+
+                if (state is UiState.Success) {
+                    val isDataEmpty = state.data.isEmpty()
+                    rvSearchResults.isVisible = !isDataEmpty
+                    tvEmptySearch.isVisible = isDataEmpty
+
+                    searchAdapter.submitList(state.data)
+                }
             }
         }
     }
 
     private fun setupSearch() {
-        with(binding) {
-            searchView.setupWithSearchBar(searchBar)
-            searchView
-                .editText
-                .setOnEditorActionListener { _, _, _ ->
-                    searchBar.setText(searchView.text)
-                    homeViewModel.searchEvents(searchView.text.toString())
+        binding.searchView.setupWithSearchBar(binding.searchBar)
 
-                    false
+        lifecycleScope.launch {
+            binding.searchView.editText.textChangesAsFlow()
+                .debounce(500)
+                .distinctUntilChanged()
+                .filter { it.isNotEmpty() }
+                .collect { query ->
+                    Log.d("Search", "Mencari: $query")
+                    homeViewModel.searchEvents(query)
                 }
+        }
 
-            searchView.addTransitionListener { _, _, newState ->
-                if (newState == SearchView.TransitionState.HIDDEN) {
-                    searchAdapter.submitList(emptyList())
-                    tvEmptySearch.visibility = View.GONE
-                    rvSearchResults.visibility = View.VISIBLE
-                    searchBar.setText("")
-                }
+        binding.searchView.addTransitionListener { _, _, newState ->
+            if (newState == SearchView.TransitionState.HIDDEN) {
+                binding.searchBar.setText("")
+                homeViewModel.clearSearch()
             }
         }
-    }
-
-    private fun showLoadingFinished(isLoading: Boolean) {
-        val shimmerView = binding.shimmerFinished.root
-        DisplayUtils.toggleLoading(isLoading, shimmerView, binding.rvFinishedEvents)
-    }
-
-    private fun showLoadingUpcoming(isLoading: Boolean) {
-        val shimmerView = binding.shimmerUpcoming.root
-        DisplayUtils.toggleLoading(isLoading, shimmerView, binding.rvUpcomingEvents)
-    }
-
-    private fun showLoadingSearch(isLoading: Boolean) {
-        val shimmerView = binding.shimmerSearch.root
-        DisplayUtils.toggleLoading(isLoading, shimmerView, binding.rvSearchResults)
     }
 }

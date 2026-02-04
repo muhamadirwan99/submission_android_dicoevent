@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.navigation.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -23,7 +24,6 @@ import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
-
     private val args: DetailActivityArgs by navArgs()
     private val detailViewModel by viewModels<DetailViewModel>()
 
@@ -51,41 +51,29 @@ class DetailActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         detailViewModel.eventDetailState.observe(this) { state ->
-            when (state) {
-                is UiState.Loading -> {
-                    with(binding) {
-                        layoutContent.layoutContent.visibility = View.GONE
-                        layoutError.layoutError.visibility = View.GONE
-                        actionRegister.visibility = View.GONE
-                        shimmerLoading.shimmerViewContainer.visibility = View.VISIBLE
-                    }
-                }
+            with(binding) {
+                shimmerLoading.shimmerViewContainer.isVisible = state is UiState.Loading
+                layoutContent.root.isVisible = state is UiState.Success
+                layoutError.layoutError.isVisible = state is UiState.Error
+                actionRegister.isVisible = state is UiState.Success
 
-                is UiState.Success -> {
-                    with(binding) {
-                        layoutContent.layoutContent.visibility = View.VISIBLE
-                        layoutError.layoutError.visibility = View.GONE
-                        actionRegister.visibility = View.VISIBLE
-                        shimmerLoading.shimmerViewContainer.visibility = View.GONE
+                when (state) {
+                    is UiState.Success -> {
                         actionRegister.setOnClickListener {
                             openUrl(state.data.link)
                         }
+
+                        bindDataDetail(state.data)
                     }
 
-                    bindDataDetail(state.data)
-                }
-
-                is UiState.Error -> {
-                    with(binding) {
-                        layoutContent.layoutContent.visibility = View.GONE
-                        shimmerLoading.shimmerViewContainer.visibility = View.GONE
-                        layoutError.layoutError.visibility = View.VISIBLE
-                        actionRegister.visibility = View.GONE
+                    is UiState.Error -> {
                         layoutError.tvErrorMessage.text = state.errorMessage
                         layoutError.btnRetry.setOnClickListener {
                             detailViewModel.getDetailEvent(args.eventId)
                         }
                     }
+
+                    else -> {}
                 }
             }
         }
@@ -138,8 +126,6 @@ class DetailActivity : AppCompatActivity() {
             }
 
             val htmlDescription = eventDetail.description ?: ""
-
-
 
             tvCategory.text = eventDetail.category
             tvEventName.text = eventDetail.name
