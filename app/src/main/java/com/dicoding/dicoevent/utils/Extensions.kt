@@ -2,7 +2,6 @@ package com.dicoding.dicoevent.utils
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.core.net.toUri
 

@@ -66,28 +66,33 @@
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <include
-                    android:id="@+id/shimmer_upcoming"
-                    layout="@layout/layout_shimmer_upcoming"
+                <LinearLayout
+                    android:id="@+id/group_upcoming_events"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:visibility="visible"
+                    android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/group_header" />
+                    app:layout_constraintTop_toBottomOf="@+id/group_header">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_upcoming_events"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:nestedScrollingEnabled="false"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/group_header" />
+                    <include
+                        android:id="@+id/shimmer_upcoming"
+                        layout="@layout/layout_shimmer_upcoming"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:visibility="visible" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_upcoming_events"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:nestedScrollingEnabled="false"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/tv_finished_events"
@@ -100,7 +105,7 @@
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/rv_upcoming_events" />
+                    app:layout_constraintTop_toBottomOf="@+id/group_upcoming_events" />
 
                 <include
                     android:id="@+id/shimmer_finished"

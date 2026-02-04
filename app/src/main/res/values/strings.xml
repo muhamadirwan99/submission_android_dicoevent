@@ -27,6 +27,6 @@
     <string name="progress_registrants">478 / 2000</string>
     <string name="percentage">23.9%</string>
     <string name="description_goes_here">Description goes here...</string>
-    <string name="registrants_format">%1$d / %2$d</string>
+    <string name="registrants_format">%1$d / %2$d Registered</string>
     <string name="progress_percentage">%.1f%%</string>
 </resources>

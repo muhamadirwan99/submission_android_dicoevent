@@ -19,6 +19,7 @@ class DetailViewModel : ViewModel() {
     private val _eventDetail = MutableLiveData<EventDetail>()
     val eventDetail: LiveData<EventDetail> = _eventDetail
 
+    //TODO: Implementasikan loading
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 

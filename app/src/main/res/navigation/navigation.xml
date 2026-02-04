@@ -43,5 +43,9 @@
             android:name="eventId"
             android:defaultValue="0"
             app:argType="integer" />
+        <argument
+            android:name="isActiveEvent"
+            app:argType="boolean"
+            android:defaultValue="true" />
     </activity>
 </navigation>

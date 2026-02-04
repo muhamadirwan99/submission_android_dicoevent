@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.databinding.FragmentHomeBinding
 import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
+import com.dicoding.dicoevent.utils.DisplayUtils
 import com.dicoding.dicoevent.utils.openUrl
 import com.google.android.material.search.SearchView
 
@@ -40,7 +41,7 @@ class HomeFragment : Fragment() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val layoutParams = binding.searchBar.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.topMargin = systemBars.top + convertDpToPixel(requireContext())
+            layoutParams.topMargin = systemBars.top + DisplayUtils.convertDpToPixel(requireContext())
             binding.searchBar.layoutParams = layoutParams
 
             insets
@@ -55,10 +56,6 @@ class HomeFragment : Fragment() {
 
         val layoutUpcomingManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvUpcomingEvents.layoutManager = layoutUpcomingManager
-    }
-
-    private fun convertDpToPixel(context: Context): Int {
-        return (16f * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).toInt()
     }
 
     private fun setupRecyclerViews() {
@@ -116,7 +113,7 @@ class HomeFragment : Fragment() {
         homeViewModel.searchEvents.observe(viewLifecycleOwner) { events ->
             searchAdapter.submitList(events)
 
-            binding.apply {
+            with(binding) {
                 if (events.isEmpty()) {
                     tvEmptySearch.visibility = View.VISIBLE
                     rvSearchResults.visibility = View.GONE
@@ -166,34 +163,18 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun toggleLoading(
-        isLoading: Boolean,
-        shimmerContainer: com.facebook.shimmer.ShimmerFrameLayout,
-        recyclerView: androidx.recyclerview.widget.RecyclerView
-    ) {
-        if (isLoading) {
-            shimmerContainer.visibility = View.VISIBLE
-            shimmerContainer.startShimmer()
-            recyclerView.visibility = View.GONE
-        } else {
-            shimmerContainer.stopShimmer()
-            shimmerContainer.visibility = View.GONE
-            recyclerView.visibility = View.VISIBLE
-        }
-    }
-
     private fun showLoadingFinished(isLoading: Boolean) {
         val shimmerView = binding.shimmerFinished.root
-        toggleLoading(isLoading, shimmerView, binding.rvFinishedEvents)
+        DisplayUtils.toggleLoading(isLoading, shimmerView, binding.rvFinishedEvents)
     }
 
     private fun showLoadingUpcoming(isLoading: Boolean) {
         val shimmerView = binding.shimmerUpcoming.root
-        toggleLoading(isLoading, shimmerView, binding.rvUpcomingEvents)
+        DisplayUtils.toggleLoading(isLoading, shimmerView, binding.rvUpcomingEvents)
     }
 
     private fun showLoadingSearch(isLoading: Boolean) {
         val shimmerView = binding.shimmerSearch.root
-        toggleLoading(isLoading, shimmerView, binding.rvSearchResults)
+        DisplayUtils.toggleLoading(isLoading, shimmerView, binding.rvSearchResults)
     }
 }

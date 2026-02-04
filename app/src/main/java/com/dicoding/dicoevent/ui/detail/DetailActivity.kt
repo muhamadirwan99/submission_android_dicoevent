@@ -2,12 +2,10 @@ package com.dicoding.dicoevent.ui.detail
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.Html
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.navArgs
@@ -51,13 +49,23 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
+        detailViewModel.snackbarText.observe(this) { event ->
+            event.getContentIfNotHandled()?.let { message ->
+                com.google.android.material.snackbar.Snackbar.make(
+                    binding.root,
+                    message,
+                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                ).show()
+            }
+        }
+
         binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
     }
 
     private fun bindDataDetail(eventDetail: EventDetail) {
-        binding.apply {
+        with(binding) {
             val time = DateUtils.formatEventDate(eventDetail.beginTime, eventDetail.endTime)
             val quota = eventDetail.quota ?: 0
             val registrants = eventDetail.registrants ?: 0
@@ -107,6 +115,7 @@ class DetailActivity : AppCompatActivity() {
             tvEventName.text = eventDetail.name
             tvOwnerName.text = eventDetail.ownerName
             tvLocation.text = eventDetail.cityName
+            tvSummary.text = eventDetail.summary
 
             tvTimeMain.text = time.timeMain
             tvTimeSub.text = time.timeSub
@@ -116,11 +125,6 @@ class DetailActivity : AppCompatActivity() {
 
             progressBar.progress = percentage.toInt().coerceIn(0, 100)
 
-            tvSummary.text = eventDetail.summary
-//            tvDescription.text = HtmlCompat.fromHtml(
-//                htmlDescription,
-//                HtmlCompat.FROM_HTML_MODE_LEGACY
-//            )
             tvDescription.setHtml(
                 htmlDescription,
                 HtmlHttpImageGetter(tvDescription)
