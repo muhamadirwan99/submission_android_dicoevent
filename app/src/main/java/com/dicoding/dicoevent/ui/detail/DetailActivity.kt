@@ -17,6 +17,7 @@ import com.dicoding.dicoevent.R
 import com.dicoding.dicoevent.data.response.EventDetail
 import com.dicoding.dicoevent.databinding.ActivityDetailBinding
 import com.dicoding.dicoevent.utils.DateUtils
+import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.openUrl
 import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter
 
@@ -41,31 +42,91 @@ class DetailActivity : AppCompatActivity() {
             detailViewModel.getDetailEvent(args.eventId)
         }
 
-        detailViewModel.eventDetail.observe(this) { eventDetail ->
-            bindDataDetail(eventDetail)
-
-            binding.actionRegister.setOnClickListener {
-                openUrl(eventDetail.link)
-            }
-        }
-
-        detailViewModel.snackbarText.observe(this) { event ->
-            event.getContentIfNotHandled()?.let { message ->
-                com.google.android.material.snackbar.Snackbar.make(
-                    binding.root,
-                    message,
-                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-                ).show()
-            }
-        }
+        observeViewModel()
 
         binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
     }
 
+    private fun observeViewModel() {
+        detailViewModel.eventDetailState.observe(this) { state ->
+            when (state) {
+                is UiState.Loading -> {
+                    with(binding) {
+                        layoutContent.layoutContent.visibility = View.GONE
+                        layoutError.layoutError.visibility = View.GONE
+                        actionRegister.visibility = View.GONE
+                        shimmerLoading.shimmerViewContainer.visibility = View.VISIBLE
+                    }
+                }
+
+                is UiState.Success -> {
+                    with(binding) {
+                        layoutContent.layoutContent.visibility = View.VISIBLE
+                        layoutError.layoutError.visibility = View.GONE
+                        actionRegister.visibility = View.VISIBLE
+                        shimmerLoading.shimmerViewContainer.visibility = View.GONE
+                        actionRegister.setOnClickListener {
+                            openUrl(state.data.link)
+                        }
+                    }
+
+                    bindDataDetail(state.data)
+                }
+
+                is UiState.Error -> {
+                    with(binding) {
+                        layoutContent.layoutContent.visibility = View.GONE
+                        shimmerLoading.shimmerViewContainer.visibility = View.GONE
+                        layoutError.layoutError.visibility = View.VISIBLE
+                        actionRegister.visibility = View.GONE
+                        layoutError.tvErrorMessage.text = state.errorMessage
+                        layoutError.btnRetry.setOnClickListener {
+                            detailViewModel.getDetailEvent(args.eventId)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
     private fun bindDataDetail(eventDetail: EventDetail) {
-        with(binding) {
+        Glide.with(this)
+            .load(eventDetail.mediaCover)
+            .error(R.drawable.baseline_broken_image_24)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    binding.shimmerViewContainer.stopShimmer()
+                    binding.shimmerViewContainer.visibility = View.GONE
+
+                    binding.imageEvent.visibility = View.VISIBLE
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable?>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    binding.shimmerViewContainer.stopShimmer()
+                    binding.shimmerViewContainer.visibility = View.GONE
+
+                    binding.imageEvent.visibility = View.VISIBLE
+                    return false
+                }
+            })
+            .into(binding.imageEvent)
+
+        with(binding.layoutContent) {
             val time = DateUtils.formatEventDate(eventDetail.beginTime, eventDetail.endTime)
             val quota = eventDetail.quota ?: 0
             val registrants = eventDetail.registrants ?: 0
@@ -78,38 +139,7 @@ class DetailActivity : AppCompatActivity() {
 
             val htmlDescription = eventDetail.description ?: ""
 
-            Glide.with(root.context)
-                .load(eventDetail.mediaCover)
-                .error(R.drawable.baseline_broken_image_24)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: com.bumptech.glide.request.target.Target<Drawable?>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        shimmerViewContainer.stopShimmer()
-                        shimmerViewContainer.visibility = View.GONE
 
-                        imageEvent.visibility = View.VISIBLE
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: com.bumptech.glide.request.target.Target<Drawable?>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        shimmerViewContainer.stopShimmer()
-                        shimmerViewContainer.visibility = View.GONE
-
-                        imageEvent.visibility = View.VISIBLE
-                        return false
-                    }
-                })
-                .into(binding.imageEvent)
 
             tvCategory.text = eventDetail.category
             tvEventName.text = eventDetail.name

@@ -5,15 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dicoding.dicoevent.data.response.EventResponse
 import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.data.retrofit.ApiConfig
-import com.dicoding.dicoevent.utils.EventUtil
+import com.dicoding.dicoevent.ui.detail.DetailViewModel
 import com.dicoding.dicoevent.utils.UiState
+import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -33,7 +30,7 @@ class UpcomingViewModel : ViewModel() {
         getListUpcomingEvents()
     }
 
-     fun getListUpcomingEvents() {
+    fun getListUpcomingEvents() {
         _upcomingState.value = UiState.Loading
 
         viewModelScope.launch {
@@ -43,14 +40,12 @@ class UpcomingViewModel : ViewModel() {
                 _upcomingState.value = UiState.Success(response.listEvents)
 
             } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e(TAG, "getListUpcomingEvents Failure: ${e.localizedMessage}")
 
-                val errorMessage = when (e) {
-                    is UnknownHostException -> "Tidak ada koneksi internet"
-                    is SocketTimeoutException -> "Koneksi timeout, silakan coba lagi"
-                    else -> e.message ?: "Terjadi kesalahan yang tidak diketahui"
-                }
-                Log.e(TAG, "getListUpcomingEvents Failure: ${e.message}")
-                _upcomingState.value = UiState.Error(errorMessage)
+                val userMessage = e.toUserFriendlyMessage()
+
+                _upcomingState.value = UiState.Error(userMessage)
             }
         }
     }
@@ -69,13 +64,12 @@ class UpcomingViewModel : ViewModel() {
                 _searchState.value = UiState.Success(response.listEvents)
 
             } catch (e: Exception) {
-                val errorMessage = when (e) {
-                    is UnknownHostException -> "Tidak ada koneksi internet"
-                    is SocketTimeoutException -> "Koneksi timeout saat mencari"
-                    else -> "Gagal mencari: ${e.message}"
-                }
-                Log.e(TAG, "searchEvents Failure: ${e.message}")
-                _searchState.value = UiState.Error(errorMessage)
+                e.printStackTrace()
+                Log.e(TAG, "getListUpcomingEvents Failure: ${e.localizedMessage}")
+
+                val userMessage = e.toUserFriendlyMessage()
+
+                _searchState.value = UiState.Error(userMessage)
             }
         }
     }
