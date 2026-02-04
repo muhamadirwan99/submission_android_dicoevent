@@ -13,7 +13,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.dicoding.dicoevent.R
 import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.databinding.ItemRowEventBinding
-import com.dicoding.dicoevent.util.formatDateForDisplay
+import com.dicoding.dicoevent.utils.formatDateForDisplay
 
 class EventVerticalAdapter : ListAdapter<ListEventsItem, EventVerticalAdapter.MyViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(

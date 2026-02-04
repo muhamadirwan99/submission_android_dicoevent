@@ -64,4 +64,6 @@ dependencies {
     // Navigation Component
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    // HtmlTextView
+    implementation(libs.html.textview)
 }

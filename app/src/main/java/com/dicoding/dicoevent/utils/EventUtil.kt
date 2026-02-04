@@ -1,11 +1,10 @@
-package com.dicoding.dicoevent.util
+package com.dicoding.dicoevent.utils
 
 
-open class Event<out T>(private val content: T) {
+open class EventUtil<out T>(private val content: T) {
     @Suppress("MemberVisibilityCanBePrivate")
     var hasBeenHandled = false
         private set
-
 
     fun getContentIfNotHandled(): T? {
         return if (hasBeenHandled) {

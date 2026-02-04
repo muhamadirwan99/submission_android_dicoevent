@@ -21,6 +21,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_circle_glass"
+                android:contentDescription="@string/back"
+                android:elevation="6dp"
+                android:src="@drawable/baseline_arrow_back_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@android:color/white" />
+
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/shimmer_view_container"
                 android:layout_width="0dp"
@@ -70,10 +84,10 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:scaleType="centerCrop"
+                        android:src="@drawable/dicoding_logo"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:shapeAppearanceOverlay="@style/RoundedSquare"
-                        tools:srcCompat="@drawable/dicoding_logo" />
+                        app:shapeAppearanceOverlay="@style/RoundedSquare" />
 
                     <TextView
                         android:id="@+id/tv_category"
@@ -150,31 +164,36 @@
                         android:backgroundTint="#E3F2FD"
                         android:padding="10dp"
                         android:src="@drawable/outline_calendar_today_24"
-                        app:layout_constraintEnd_toStartOf="@id/iv_icon_location"
-                        app:layout_constraintHorizontal_chainStyle="spread"
-                        app:layout_constraintStart_toStartOf="parent"
+                        android:contentDescription="@string/date"
+                        app:layout_constraintEnd_toEndOf="@+id/tv_time_sub"
+                        app:layout_constraintStart_toStartOf="@+id/tv_time_sub"
                         app:layout_constraintTop_toTopOf="parent"
                         app:tint="#1976D2" />
 
                     <TextView
                         android:id="@+id/tv_time_main"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="@id/iv_icon_time"
-                        app:layout_constraintStart_toStartOf="@id/iv_icon_time"
+                        app:layout_constraintEnd_toStartOf="@id/tv_location"
+                        app:layout_constraintHorizontal_chainStyle="spread"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/iv_icon_time"
                         tools:text="@string/date" />
 
                     <TextView
                         android:id="@+id/tv_time_sub"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="@id/iv_icon_time"
-                        app:layout_constraintStart_toStartOf="@id/iv_icon_time"
+                        app:layout_constraintEnd_toEndOf="@id/tv_time_main"
+                        app:layout_constraintStart_toStartOf="@id/tv_time_main"
                         app:layout_constraintTop_toBottomOf="@id/tv_time_main"
                         tools:text="@string/time" />
 
@@ -187,23 +206,26 @@
                         android:backgroundTint="#E8F5E9"
                         android:padding="10dp"
                         android:src="@drawable/outline_location_on_24"
-                        app:layout_constraintEnd_toStartOf="@id/iv_icon_people"
-                        app:layout_constraintStart_toEndOf="@id/iv_icon_time"
+                        android:contentDescription="@string/place"
+                        app:layout_constraintEnd_toEndOf="@+id/tv_location"
+                        app:layout_constraintStart_toStartOf="@+id/tv_location"
                         app:layout_constraintTop_toTopOf="parent"
                         app:tint="#388E3C" />
 
                     <TextView
                         android:id="@+id/tv_location"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:ellipsize="end"
+                        android:gravity="center"
+                        android:maxLines="2"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="@id/iv_icon_location"
-                        app:layout_constraintStart_toStartOf="@id/iv_icon_location"
+                        app:layout_constraintEnd_toStartOf="@id/tv_registrants"
+                        app:layout_constraintStart_toEndOf="@id/tv_time_main"
                         app:layout_constraintTop_toBottomOf="@id/iv_icon_location"
                         tools:text="@string/place" />
-
 
                     <ImageView
                         android:id="@+id/iv_icon_people"
@@ -211,46 +233,55 @@
                         android:layout_height="48dp"
                         android:background="@drawable/bg_icon_circle"
                         android:backgroundTint="#F3E5F5"
+                        android:contentDescription="@string/registrants"
                         android:padding="10dp"
                         android:src="@drawable/baseline_person_24"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/iv_icon_location"
+                        app:layout_constraintEnd_toEndOf="@+id/tv_registrants"
+                        app:layout_constraintStart_toStartOf="@+id/tv_registrants"
                         app:layout_constraintTop_toTopOf="parent"
                         app:tint="#7B1FA2" />
 
                     <TextView
                         android:id="@+id/tv_registrants"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:gravity="center"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="@id/iv_icon_people"
-                        app:layout_constraintStart_toStartOf="@id/iv_icon_people"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tv_location"
                         app:layout_constraintTop_toBottomOf="@id/iv_icon_people"
                         tools:text="@string/progress_registrants" />
 
                     <TextView
                         android:id="@+id/tv_registrants_label"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="@id/iv_icon_people"
-                        app:layout_constraintStart_toStartOf="@id/iv_icon_people"
+                        app:layout_constraintEnd_toEndOf="@id/tv_registrants"
+                        app:layout_constraintStart_toStartOf="@id/tv_registrants"
                         app:layout_constraintTop_toBottomOf="@id/tv_registrants"
                         tools:text="@string/registrants" />
 
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/barrier_stats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="tv_time_sub,tv_location,tv_registrants_label" />
 
                     <TextView
                         android:id="@+id/tv_progress_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
+                        android:text="@string/quota_registrants"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="14sp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_time_sub"
-                        tools:text="@string/quota_registrants" />
+                        app:layout_constraintTop_toBottomOf="@id/barrier_stats" />
 
                     <TextView
                         android:id="@+id/tv_progress_percentage"
@@ -292,6 +323,7 @@
                 app:strokeWidth="1dp">
 
                 <TextView
+                    android:id="@+id/tv_summary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
@@ -300,37 +332,35 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:id="@+id/tv_description"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layout_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:autoLink="web"
-                android:lineSpacingExtra="4dp"
-                android:linksClickable="true"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="14sp"
-                app:layout_constraintTop_toBottomOf="@+id/layout_summary"
-                tools:text="@string/description_goes_here" />
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_summary"
+                app:strokeColor="?attr/colorOnSurfaceInverse"
+                app:strokeWidth="1dp">
+
+                <org.sufficientlysecure.htmltextview.HtmlTextView
+                    android:id="@+id/tv_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:autoLink="web"
+                    android:lineSpacingExtra="4dp"
+                    android:linksClickable="true"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp"
+                    app:layout_constraintTop_toBottomOf="@+id/layout_summary"
+                    tools:text="@string/description_goes_here" />
+
+            </com.google.android.material.card.MaterialCardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
     </androidx.core.widget.NestedScrollView>
-
-    <ImageButton
-        android:id="@+id/btn_back"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_circle_glass"
-        android:contentDescription="@string/back"
-        android:elevation="6dp"
-        android:src="@drawable/baseline_arrow_back_24"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@android:color/white" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/action_register"

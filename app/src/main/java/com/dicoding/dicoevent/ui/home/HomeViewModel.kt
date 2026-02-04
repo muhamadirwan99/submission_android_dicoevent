@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.dicoding.dicoevent.data.response.EventResponse
 import com.dicoding.dicoevent.data.response.ListEventsItem
 import com.dicoding.dicoevent.data.retrofit.ApiConfig
-import com.dicoding.dicoevent.util.Event
+import com.dicoding.dicoevent.utils.EventUtil
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,8 +32,8 @@ class HomeViewModel : ViewModel() {
     private val _isLoadingSearch = MutableLiveData<Boolean>(false)
     val isLoadingSearch: LiveData<Boolean> = _isLoadingSearch
 
-    private val _snackbarText = MutableLiveData<Event<String>>()
-    val snackbarText: LiveData<Event<String>> = _snackbarText
+    private val _snackbarText = MutableLiveData<EventUtil<String>>()
+    val snackbarText: LiveData<EventUtil<String>> = _snackbarText
 
     companion object {
         private const val TAG = "HomeViewModel"
@@ -57,7 +57,7 @@ class HomeViewModel : ViewModel() {
                         _finishedEvents.value = responseBody.listEvents.take(5)
                     }
                 } else {
-                    _snackbarText.value = Event("Failed to fetch data: ${response.message()}")
+                    _snackbarText.value = EventUtil("Failed to fetch data: ${response.message()}")
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
@@ -71,7 +71,7 @@ class HomeViewModel : ViewModel() {
                     else -> "onFailure: ${t.message}"
                 }
 
-                _snackbarText.value = Event(errorMessage)
+                _snackbarText.value = EventUtil(errorMessage)
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
@@ -93,7 +93,7 @@ class HomeViewModel : ViewModel() {
                         _upcomingEvents.value = responseBody.listEvents.take(5)
                     }
                 } else {
-                    _snackbarText.value = Event("Failed to fetch upcoming events: ${response.message()}")
+                    _snackbarText.value = EventUtil("Failed to fetch upcoming events: ${response.message()}")
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
@@ -107,7 +107,7 @@ class HomeViewModel : ViewModel() {
                     else -> "onFailure: ${t.message}"
                 }
 
-                _snackbarText.value = Event(errorMessage)
+                _snackbarText.value = EventUtil(errorMessage)
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
@@ -129,7 +129,7 @@ class HomeViewModel : ViewModel() {
                         _searchEvents.value = responseBody.listEvents
                     }
                 } else {
-                    _snackbarText.value = Event("Failed to search events: ${response.message()}")
+                    _snackbarText.value = EventUtil("Failed to search events: ${response.message()}")
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
@@ -143,7 +143,7 @@ class HomeViewModel : ViewModel() {
                     else -> "Search error: ${t.message}"
                 }
 
-                _snackbarText.value = Event(errorMessage)
+                _snackbarText.value = EventUtil(errorMessage)
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
