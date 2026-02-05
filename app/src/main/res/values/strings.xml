@@ -14,7 +14,7 @@
     <string name="back">Back</string>
     <string name="background_event">Background Event</string>
     <string name="register_now">REGISTER NOW</string>
-    <string name="quota_registrants">Quota Registrants</string>
+    <string name="remaining_quota">Remaining Quota %1$d</string>
     <string name="registrants">Registrants</string>
     <string name="date">Date</string>
     <string name="by">By Dicoding Event</string>

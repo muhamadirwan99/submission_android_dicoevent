@@ -220,7 +220,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/quota_registrants"
+                android:text="@string/remaining_quota"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"

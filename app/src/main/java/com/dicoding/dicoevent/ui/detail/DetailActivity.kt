@@ -118,9 +118,10 @@ class DetailActivity : AppCompatActivity() {
             val time = DateUtils.formatEventDate(eventDetail.beginTime, eventDetail.endTime)
             val quota = eventDetail.quota ?: 0
             val registrants = eventDetail.registrants ?: 0
+            val remainingQuota = (quota - registrants).coerceAtLeast(0)
 
             val percentage = if (quota > 0) {
-                (registrants.toDouble() / quota) * 100
+                (remainingQuota.toDouble() / quota) * 100
             } else {
                 0.0
             }
@@ -132,6 +133,7 @@ class DetailActivity : AppCompatActivity() {
             tvOwnerName.text = eventDetail.ownerName
             tvLocation.text = eventDetail.cityName
             tvSummary.text = eventDetail.summary
+            tvProgressLabel.text = getString(R.string.remaining_quota, remainingQuota)
 
             tvTimeMain.text = time.timeMain
             tvTimeSub.text = time.timeSub
