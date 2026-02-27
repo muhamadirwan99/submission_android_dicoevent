@@ -91,10 +91,13 @@ class DetailActivity : AppCompatActivity() {
                     target: com.bumptech.glide.request.target.Target<Drawable?>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    binding.shimmerViewContainer.stopShimmer()
-                    binding.shimmerViewContainer.visibility = View.GONE
+                    with(binding) {
+                        shimmerViewContainer.stopShimmer()
+                        shimmerViewContainer.visibility = View.GONE
 
-                    binding.imageEvent.visibility = View.VISIBLE
+                        imageEvent.visibility = View.VISIBLE
+                    }
+
                     return false
                 }
 

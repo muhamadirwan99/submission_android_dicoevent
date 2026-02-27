@@ -1,6 +1,5 @@
 package com.dicoding.dicoevent.ui.home
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -40,9 +39,6 @@ class HomeViewModel : ViewModel() {
                 _finishedState.value = UiState.Success(response.listEvents.take(5))
 
             } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e(TAG, "getListFinishedEvents Failure: ${e.localizedMessage}")
-
                 val userMessage = e.toUserFriendlyMessage()
 
                 _finishedState.value = UiState.Error(userMessage)
@@ -60,9 +56,6 @@ class HomeViewModel : ViewModel() {
                 _upcomingState.value = UiState.Success(response.listEvents.take(5))
 
             } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e(TAG, "getListUpcomingEvents Failure: ${e.localizedMessage}")
-
                 val userMessage = e.toUserFriendlyMessage()
 
                 _upcomingState.value = UiState.Error(userMessage)
@@ -85,9 +78,6 @@ class HomeViewModel : ViewModel() {
                 _searchState.value = UiState.Success(response.listEvents)
 
             } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e(TAG, "getSearchEvent Failure: ${e.localizedMessage}")
-
                 val userMessage = e.toUserFriendlyMessage()
 
                 _searchState.value = UiState.Error(userMessage)

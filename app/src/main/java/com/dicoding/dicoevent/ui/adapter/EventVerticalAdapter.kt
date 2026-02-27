@@ -35,9 +35,11 @@ class EventVerticalAdapter(
 
     class MyViewHolder(val binding: ItemRowEventBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(event: ListEventsItem, onItemClick: (Int) -> Unit) {
-            binding.tvItemTitle.text = event.name
-            binding.tvItemDate.text = event.beginTime?.formatDateForDisplay()
-            binding.tvItemPlace.text = event.cityName
+            with(binding) {
+                tvItemTitle.text = event.name
+                tvItemDate.text = event.beginTime?.formatDateForDisplay()
+                tvItemPlace.text = event.cityName
+            }
 
             Glide.with(itemView.context)
                 .load(event.imageLogo)

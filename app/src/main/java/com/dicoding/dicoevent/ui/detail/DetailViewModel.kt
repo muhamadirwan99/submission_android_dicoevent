@@ -1,6 +1,5 @@
 package com.dicoding.dicoevent.ui.detail
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -29,9 +28,6 @@ class DetailViewModel : ViewModel() {
                 _eventDetailState.value = UiState.Success(response.eventDetail ?: EventDetail())
 
             } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e(TAG, "getDetailEvent Failure: ${e.localizedMessage}")
-
                 val userMessage = e.toUserFriendlyMessage()
 
                 _eventDetailState.value = UiState.Error(userMessage)

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -90,7 +91,8 @@
                         android:layout_marginTop="8dp"
                         android:nestedScrollingEnabled="false"
                         android:orientation="horizontal"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_horizontal_event" />
 
                     <include
                         android:id="@+id/layout_error_upcoming"
@@ -128,10 +130,10 @@
 
                 <include
                     android:id="@+id/layout_error_finished"
-                    android:visibility="gone"
                     layout="@layout/layout_error"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_finished_events" />
@@ -146,7 +148,8 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_finished_events" />
+                    app:layout_constraintTop_toBottomOf="@+id/tv_finished_events"
+                    tools:listitem="@layout/item_row_event" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,7 +1,6 @@
 package com.dicoding.dicoevent.ui.finished
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +25,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlin.getValue
-
 
 class FinishedFragment : Fragment() {
 
@@ -144,7 +142,6 @@ class FinishedFragment : Fragment() {
         lifecycleScope.launch {
             binding.searchView.editText.textChangesAsFlow().debounce(500).distinctUntilChanged()
                 .filter { it.isNotEmpty() }.collect { query ->
-                    Log.d("Search", "Mencari: $query")
                     viewModel.searchEvents(query)
                 }
         }
