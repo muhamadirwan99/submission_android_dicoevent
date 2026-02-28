@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dicoding.dicoevent.data.response.ListEventsItem
-import com.dicoding.dicoevent.data.retrofit.ApiConfig
+import com.dicoding.dicoevent.data.remote.response.ListEventsItem
+import com.dicoding.dicoevent.data.remote.retrofit.ApiConfig
 import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 import kotlinx.coroutines.launch

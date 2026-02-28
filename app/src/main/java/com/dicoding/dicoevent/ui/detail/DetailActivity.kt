@@ -15,7 +15,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.dicoding.dicoevent.R
-import com.dicoding.dicoevent.data.response.EventDetail
+import com.dicoding.dicoevent.data.remote.response.EventDetail
 import com.dicoding.dicoevent.databinding.ActivityDetailBinding
 import com.dicoding.dicoevent.utils.DateUtils
 import com.dicoding.dicoevent.utils.UiState

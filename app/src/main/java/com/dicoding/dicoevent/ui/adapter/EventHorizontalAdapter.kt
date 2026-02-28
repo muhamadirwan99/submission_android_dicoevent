@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.dicoding.dicoevent.R
-import com.dicoding.dicoevent.data.response.ListEventsItem
+import com.dicoding.dicoevent.data.remote.response.ListEventsItem
 import com.dicoding.dicoevent.databinding.ItemCardEventBinding
 import com.dicoding.dicoevent.utils.formatDateForDisplay
 

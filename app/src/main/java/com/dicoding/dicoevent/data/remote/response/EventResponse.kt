@@ -1,20 +1,20 @@
-package com.dicoding.dicoevent.data.response
+package com.dicoding.dicoevent.data.remote.response
 
 import com.google.gson.annotations.SerializedName
 
-data class DetailEventResponse(
+data class EventResponse(
+
+	@field:SerializedName("listEvents")
+	val listEvents: List<ListEventsItem> = listOf(),
 
 	@field:SerializedName("error")
 	val error: Boolean? = null,
 
 	@field:SerializedName("message")
-	val message: String? = null,
-
-	@field:SerializedName("event")
-	val eventDetail: EventDetail? = null
+	val message: String? = null
 )
 
-data class EventDetail(
+data class ListEventsItem(
 
 	@field:SerializedName("summary")
 	val summary: String? = null,
