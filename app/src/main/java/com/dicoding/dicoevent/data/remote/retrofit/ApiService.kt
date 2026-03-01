@@ -7,13 +7,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
-    // Get active events
-    @GET("events?active=1")
-    suspend fun getActiveEvents(): EventResponse
-
-    // Get done events
-    @GET("events?active=0")
-    suspend fun getDoneEvents(): EventResponse
+    // Get events
+    @GET("events")
+    suspend fun getEvents(@Query("active")active: Int): EventResponse
 
     // Get detail event by ID
     @GET("events/{id}")

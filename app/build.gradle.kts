@@ -4,6 +4,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.androidx.navigation.safeargs)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 val localProperties = Properties()
@@ -78,4 +80,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     // HtmlTextView
     implementation(libs.html.textview)
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.room.compiler)
 }
