@@ -38,4 +38,5 @@
     <string name="enable_dark_mode">Enable dark mode</string>
     <string name="daily_reminder">Daily Reminder</string>
     <string name="enable_notification">Enable notification</string>
+    <string name="event_completed">EVENT COMPLETED</string>
 </resources>

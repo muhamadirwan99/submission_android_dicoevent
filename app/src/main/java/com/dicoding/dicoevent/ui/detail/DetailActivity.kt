@@ -1,5 +1,7 @@
 package com.dicoding.dicoevent.ui.detail
 
+import com.dicoding.dicoevent.R
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -14,13 +16,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
-import com.dicoding.dicoevent.R
 import com.dicoding.dicoevent.data.Result
 import com.dicoding.dicoevent.data.local.entity.EventEntity
 import com.dicoding.dicoevent.databinding.ActivityDetailBinding
 import com.dicoding.dicoevent.ui.ViewModelFactory
 import com.dicoding.dicoevent.utils.DateUtils
 import com.dicoding.dicoevent.utils.openUrl
+import com.google.android.material.color.MaterialColors
 import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter
 
 class DetailActivity : AppCompatActivity() {
@@ -65,6 +67,27 @@ class DetailActivity : AppCompatActivity() {
                         actionFavorite.setOnClickListener {
                             val newState = !result.data.isFavorite
                             detailViewModel.setFavoriteEvent(eventId, newState)
+                        }
+
+                        if (result.data.activeStatus == 0) {
+                            binding.actionRegister.isEnabled = false
+                            binding.actionRegister.text = getString( R.string.event_completed)
+
+                            val disabledBgColor = MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorSurfaceVariant)
+                            val disabledTextColor = MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorOnSurfaceVariant)
+
+                            binding.actionRegister.backgroundTintList = ColorStateList.valueOf(disabledBgColor)
+                            binding.actionRegister.setTextColor(disabledTextColor)
+
+                        } else {
+                            binding.actionRegister.isEnabled = true
+                            binding.actionRegister.text =getString( R.string.register_now)
+
+                            val activeBgColor = MaterialColors.getColor(binding.root, androidx.appcompat.R.attr.colorPrimary)
+                            val activeTextColor = MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorOnPrimary)
+
+                            binding.actionRegister.backgroundTintList = ColorStateList.valueOf(activeBgColor)
+                            binding.actionRegister.setTextColor(activeTextColor)
                         }
 
                         if (result.data.isFavorite) {
