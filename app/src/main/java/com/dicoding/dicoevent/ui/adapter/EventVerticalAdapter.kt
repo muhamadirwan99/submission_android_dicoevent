@@ -10,13 +10,13 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.dicoding.dicoevent.R
-import com.dicoding.dicoevent.data.remote.response.ListEventsItem
+import com.dicoding.dicoevent.data.local.entity.EventEntity
 import com.dicoding.dicoevent.databinding.ItemRowEventBinding
 import com.dicoding.dicoevent.utils.formatDateForDisplay
 
 class EventVerticalAdapter(
     private val onItemClick: (Int) -> Unit,
-) : ListAdapter<ListEventsItem, EventVerticalAdapter.MyViewHolder>(DIFF_CALLBACK) {
+) : ListAdapter<EventEntity, EventVerticalAdapter.MyViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -34,7 +34,7 @@ class EventVerticalAdapter(
     }
 
     class MyViewHolder(val binding: ItemRowEventBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(event: ListEventsItem, onItemClick: (Int) -> Unit) {
+        fun bind(event: EventEntity, onItemClick: (Int) -> Unit) {
             with(binding) {
                 tvItemTitle.text = event.name
                 tvItemDate.text = event.beginTime?.formatDateForDisplay()
@@ -50,23 +50,23 @@ class EventVerticalAdapter(
                 .into(binding.imgItemPhoto)
 
             itemView.setOnClickListener {
-                onItemClick(event.id ?: 0)
+                onItemClick(event.id)
             }
         }
     }
 
     companion object {
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListEventsItem>() {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<EventEntity>() {
             override fun areItemsTheSame(
-                oldItem: ListEventsItem,
-                newItem: ListEventsItem
+                oldItem: EventEntity,
+                newItem: EventEntity
             ): Boolean {
                 return oldItem.id == newItem.id
             }
 
             override fun areContentsTheSame(
-                oldItem: ListEventsItem,
-                newItem: ListEventsItem
+                oldItem: EventEntity,
+                newItem: EventEntity
             ): Boolean {
                 return oldItem == newItem
             }

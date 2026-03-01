@@ -15,17 +15,20 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.dicoding.dicoevent.R
-import com.dicoding.dicoevent.data.remote.response.EventDetail
+import com.dicoding.dicoevent.data.Result
+import com.dicoding.dicoevent.data.local.entity.EventEntity
 import com.dicoding.dicoevent.databinding.ActivityDetailBinding
+import com.dicoding.dicoevent.ui.ViewModelFactory
 import com.dicoding.dicoevent.utils.DateUtils
-import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.openUrl
 import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter
 
 class DetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailBinding
     private val args: DetailActivityArgs by navArgs()
-    private val detailViewModel by viewModels<DetailViewModel>()
+    private val detailViewModel: DetailViewModel by viewModels {
+        ViewModelFactory.getInstance(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,39 +41,32 @@ class DetailActivity : AppCompatActivity() {
             insets
         }
 
-        if (savedInstanceState == null) {
-            detailViewModel.getDetailEvent(args.eventId)
-        }
-
-        observeViewModel()
-
         binding.btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
+
+        observeViewModel(args.eventId)
     }
 
-    private fun observeViewModel() {
-        detailViewModel.eventDetailState.observe(this) { state ->
+    private fun observeViewModel(eventId: Int) {
+        detailViewModel.getDetailEvent(eventId).observe(this) { result ->
             with(binding) {
-                shimmerLoading.shimmerViewDetail.isVisible = state is UiState.Loading
-                layoutContent.root.isVisible = state is UiState.Success
-                layoutError.layoutError.isVisible = state is UiState.Error
-                actionRegister.isVisible = state is UiState.Success
+                shimmerLoading.shimmerViewDetail.isVisible = result is Result.Loading
+                layoutContent.root.isVisible = result is Result.Success
+                layoutError.layoutError.isVisible = result is Result.Error
+                actionRegister.isVisible = result is Result.Success
 
-                when (state) {
-                    is UiState.Success -> {
+                when (result) {
+                    is Result.Success -> {
                         actionRegister.setOnClickListener {
-                            openUrl(state.data.link)
+                            openUrl(result.data.link)
                         }
 
-                        bindDataDetail(state.data)
+                        bindDataDetail(result.data)
                     }
 
-                    is UiState.Error -> {
-                        layoutError.tvErrorMessage.text = state.errorMessage
-                        layoutError.btnRetry.setOnClickListener {
-                            detailViewModel.getDetailEvent(args.eventId)
-                        }
+                    is Result.Error -> {
+                        layoutError.tvErrorMessage.text = result.error
                     }
 
                     else -> {}
@@ -80,7 +76,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
 
-    private fun bindDataDetail(eventDetail: EventDetail) {
+    private fun bindDataDetail(eventDetail: EventEntity) {
         Glide.with(this)
             .load(eventDetail.mediaCover)
             .error(R.drawable.baseline_broken_image_24)
@@ -124,7 +120,7 @@ class DetailActivity : AppCompatActivity() {
             val remainingQuota = (quota - registrants).coerceAtLeast(0)
 
             val percentage = if (quota > 0) {
-                (remainingQuota.toDouble() / quota) * 100
+                (registrants.toDouble() / quota) * 100
             } else {
                 0.0
             }

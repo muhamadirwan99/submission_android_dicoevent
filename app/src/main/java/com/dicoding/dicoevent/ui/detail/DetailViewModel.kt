@@ -1,38 +1,17 @@
 package com.dicoding.dicoevent.ui.detail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dicoding.dicoevent.data.remote.response.EventDetail
-import com.dicoding.dicoevent.data.remote.retrofit.ApiConfig
-import com.dicoding.dicoevent.utils.UiState
-import com.dicoding.dicoevent.utils.toUserFriendlyMessage
+import com.dicoding.dicoevent.data.EventRepository
 import kotlinx.coroutines.launch
 
-class DetailViewModel : ViewModel() {
+class DetailViewModel(private val repository: EventRepository) : ViewModel() {
 
-    private val _eventDetailState = MutableLiveData<UiState<EventDetail>>(UiState.Loading)
-    val eventDetailState: LiveData<UiState<EventDetail>> = _eventDetailState
+    fun getDetailEvent(id: Int) = repository.getEventDetail(id)
 
-    companion object {
-        private const val TAG = "DetailViewModel"
-    }
-
-    fun getDetailEvent(id: Int) {
-        _eventDetailState.value = UiState.Loading
-
+    fun setFavoriteEvent(id: Int, isFavorite: Boolean) {
         viewModelScope.launch {
-            try {
-                val response = ApiConfig.getApiService().getDetailEvent(id)
-                _eventDetailState.value = UiState.Success(response.eventDetail ?: EventDetail())
-
-            } catch (e: Exception) {
-                val userMessage = e.toUserFriendlyMessage()
-
-                _eventDetailState.value = UiState.Error(userMessage)
-            }
+            repository.setFavoriteEvent(id, isFavorite)
         }
-
     }
 }

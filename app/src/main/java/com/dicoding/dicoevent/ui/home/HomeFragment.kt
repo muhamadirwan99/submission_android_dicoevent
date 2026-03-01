@@ -1,6 +1,7 @@
 package com.dicoding.dicoevent.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +13,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dicoding.dicoevent.data.Result
 import com.dicoding.dicoevent.databinding.FragmentHomeBinding
+import com.dicoding.dicoevent.ui.ViewModelFactory
 import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
 import com.dicoding.dicoevent.utils.DisplayUtils
-import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.openUrl
 import com.dicoding.dicoevent.utils.textChangesAsFlow
 import com.google.android.material.search.SearchView
@@ -28,7 +30,9 @@ import kotlinx.coroutines.launch
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
-    private val homeViewModel by viewModels<HomeViewModel>()
+    private val homeViewModel : HomeViewModel by viewModels {
+        ViewModelFactory.getInstance(requireActivity())
+    }
     private lateinit var finishedAdapter: EventVerticalAdapter
     private lateinit var upcomingAdapter: HomeListUpcomingAdapter
     private lateinit var searchAdapter: EventVerticalAdapter
@@ -104,46 +108,42 @@ class HomeFragment : Fragment() {
 
     private fun observeViewModel() {
         // === 1. UPCOMING SECTION ===
-        homeViewModel.upcomingState.observe(viewLifecycleOwner) { state ->
-            with(binding) {
-                shimmerUpcoming.shimmerViewUpcoming.isVisible = state is UiState.Loading
-                rvUpcomingEvents.isVisible = state is UiState.Success
-                layoutErrorUpcoming.root.isVisible = state is UiState.Error
+        homeViewModel.upcomingEvents.observe(viewLifecycleOwner) { result ->
+            if (result != null) {
+                with(binding) {
+                    shimmerUpcoming.shimmerViewUpcoming.isVisible = result is Result.Loading
+                    rvUpcomingEvents.isVisible = result is Result.Success
+                    layoutErrorUpcoming.root.isVisible = result is Result.Error
 
-                when (state) {
-                    is UiState.Success -> {
-                        upcomingAdapter.submitList(state.data)
-                    }
-
-                    is UiState.Error -> {
-                        layoutErrorUpcoming.tvErrorMessage.text = state.errorMessage
-                        layoutErrorUpcoming.btnRetry.setOnClickListener {
-                            homeViewModel.getListUpcomingEvents()
+                    when (result) {
+                        is Result.Success -> {
+                            upcomingAdapter.submitList(result.data)
                         }
-                    }
 
-                    else -> {}
+                        is Result.Error -> {
+                            layoutErrorUpcoming.tvErrorMessage.text = result.error
+                        }
+
+                        else -> {}
+                    }
                 }
             }
         }
 
         // === 2. FINISHED SECTION ===
-        homeViewModel.finishedState.observe(viewLifecycleOwner) { state ->
+        homeViewModel.finishedEvents.observe(viewLifecycleOwner) { result ->
             with(binding) {
-                shimmerFinished.shimmerViewFinished.isVisible = state is UiState.Loading
-                rvFinishedEvents.isVisible = state is UiState.Success
-                layoutErrorFinished.root.isVisible = state is UiState.Error
+                shimmerFinished.shimmerViewFinished.isVisible = result is Result.Loading
+                rvFinishedEvents.isVisible = result is Result.Success
+                layoutErrorFinished.root.isVisible = result is Result.Error
 
-                when (state) {
-                    is UiState.Success -> {
-                        finishedAdapter.submitList(state.data)
+                when (result) {
+                    is Result.Success -> {
+                        finishedAdapter.submitList(result.data)
                     }
 
-                    is UiState.Error -> {
-                        layoutErrorFinished.tvErrorMessage.text = state.errorMessage
-                        layoutErrorFinished.btnRetry.setOnClickListener {
-                            homeViewModel.getListFinishedEvents()
-                        }
+                    is Result.Error -> {
+                        layoutErrorFinished.tvErrorMessage.text = result.error
                     }
 
                     else -> {}
@@ -152,21 +152,21 @@ class HomeFragment : Fragment() {
         }
 
         // === 3. SEARCH SECTION ===
-        homeViewModel.searchState.observe(viewLifecycleOwner) { state ->
+        homeViewModel.searchState.observe(viewLifecycleOwner) { result ->
             with(binding) {
-                shimmerSearch.shimmerViewFinished.isVisible = state is UiState.Loading
+                shimmerSearch.shimmerViewFinished.isVisible = result is Result.Loading
 
-                if (state is UiState.Error) {
+                if (result is Result.Error) {
                     rvSearchResults.isVisible = false
                     tvEmptySearch.isVisible = true
                 }
 
-                if (state is UiState.Success) {
-                    val isDataEmpty = state.data.isEmpty()
+                if (result is Result.Success) {
+                    val isDataEmpty = result.data.isEmpty()
                     rvSearchResults.isVisible = !isDataEmpty
                     tvEmptySearch.isVisible = isDataEmpty
 
-                    searchAdapter.submitList(state.data)
+                    searchAdapter.submitList(result.data)
                 }
             }
         }

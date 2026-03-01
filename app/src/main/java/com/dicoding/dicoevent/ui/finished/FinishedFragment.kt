@@ -1,5 +1,6 @@
 package com.dicoding.dicoevent.ui.finished
 
+import com.dicoding.dicoevent.data.Result
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,10 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.databinding.FragmentFinishedBinding
+import com.dicoding.dicoevent.ui.ViewModelFactory
 import com.dicoding.dicoevent.ui.adapter.EventHorizontalAdapter
 import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
 import com.dicoding.dicoevent.utils.DisplayUtils
-import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.textChangesAsFlow
 import com.google.android.material.search.SearchView
 import kotlinx.coroutines.FlowPreview
@@ -29,7 +30,9 @@ import kotlin.getValue
 class FinishedFragment : Fragment() {
 
     private lateinit var binding: FragmentFinishedBinding
-    private val viewModel by viewModels<FinishedViewModel>()
+    private val viewModel : FinishedViewModel by viewModels {
+        ViewModelFactory.getInstance(requireActivity())
+    }
     private lateinit var finishedAdapter: EventHorizontalAdapter
     private lateinit var searchAdapter: EventVerticalAdapter
 
@@ -85,22 +88,19 @@ class FinishedFragment : Fragment() {
 
     private fun observeViewModel() {
         // === 1. OBSERVE UPCOMING STATE ===
-        viewModel.finishedState.observe(viewLifecycleOwner) { state ->
+        viewModel.finishedEvents.observe(viewLifecycleOwner) { result ->
             with(binding) {
-                shimmerFinishedEvents.shimmerViewEvent.isVisible = state is UiState.Loading
-                rvFinishedEvents.isVisible = state is UiState.Success
-                layoutError.root.isVisible = state is UiState.Error
+                shimmerFinishedEvents.shimmerViewEvent.isVisible = result is Result.Loading
+                rvFinishedEvents.isVisible = result is Result.Success
+                layoutError.root.isVisible = result is Result.Error
 
-                when (state) {
-                    is UiState.Success -> {
-                        finishedAdapter.submitList(state.data)
+                when (result) {
+                    is Result.Success -> {
+                        finishedAdapter.submitList(result.data)
                     }
 
-                    is UiState.Error -> {
-                        layoutError.tvErrorMessage.text = state.errorMessage
-                        layoutError.btnRetry.setOnClickListener {
-                            viewModel.getListFinishedEvents()
-                        }
+                    is Result.Error -> {
+                        layoutError.tvErrorMessage.text = result.error
                     }
 
                     else -> {}
@@ -109,24 +109,24 @@ class FinishedFragment : Fragment() {
         }
 
         // === 2. OBSERVE SEARCH STATE ===
-        viewModel.searchState.observe(viewLifecycleOwner) { state ->
+        viewModel.searchState.observe(viewLifecycleOwner) { result ->
             with(binding) {
-                shimmerSearch.shimmerViewFinished.isVisible = state is UiState.Loading
+                shimmerSearch.shimmerViewFinished.isVisible = result is Result.Loading
 
-                when (state) {
-                    is UiState.Loading -> {
+                when (result) {
+                    is Result.Loading -> {
                         rvSearchResults.isVisible = false
                         tvEmptySearch.isVisible = false
                     }
 
-                    is UiState.Success -> {
-                        val isDataEmpty = state.data.isEmpty()
+                    is Result.Success -> {
+                        val isDataEmpty = result.data.isEmpty()
                         rvSearchResults.isVisible = !isDataEmpty
                         tvEmptySearch.isVisible = isDataEmpty
-                        searchAdapter.submitList(state.data)
+                        searchAdapter.submitList(result.data)
                     }
 
-                    is UiState.Error -> {
+                    is Result.Error -> {
                         rvSearchResults.isVisible = false
                         tvEmptySearch.isVisible = true
                     }

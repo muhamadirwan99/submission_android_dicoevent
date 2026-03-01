@@ -4,66 +4,61 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dicoding.dicoevent.data.remote.response.ListEventsItem
+import com.dicoding.dicoevent.data.EventRepository
+import com.dicoding.dicoevent.data.Result
+import com.dicoding.dicoevent.data.local.entity.EventEntity
 import com.dicoding.dicoevent.data.remote.retrofit.ApiConfig
-import com.dicoding.dicoevent.utils.UiState
 import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 import kotlinx.coroutines.launch
 
-class FinishedViewModel : ViewModel() {
+class FinishedViewModel(private val repository: EventRepository) : ViewModel() {
 
-    private val _finishedState = MutableLiveData<UiState<List<ListEventsItem>>>(UiState.Loading)
-    val finishedState: LiveData<UiState<List<ListEventsItem>>> = _finishedState
-
-    private val _searchState = MutableLiveData<UiState<List<ListEventsItem>>>(UiState.Success(emptyList()))
-    val searchState: LiveData<UiState<List<ListEventsItem>>> = _searchState
-
-    companion object {
-        private const val TAG = "FinishedViewModel"
-    }
-
-    init {
-        getListFinishedEvents()
-    }
-
-    fun getListFinishedEvents() {
-        _finishedState.value = UiState.Loading
-
-        viewModelScope.launch {
-            try {
-                val response = ApiConfig.getApiService().getDoneEvents()
-                _finishedState.value = UiState.Success(response.listEvents)
-
-            } catch (e: Exception) {
-                val userMessage = e.toUserFriendlyMessage()
-
-                _finishedState.value = UiState.Error(userMessage)
-            }
-        }
-    }
+    val finishedEvents: LiveData<Result<List<EventEntity>>> = repository.getFinishedEvents()
+    private val _searchState = MutableLiveData<Result<List<EventEntity>>>()
+    val searchState: LiveData<Result<List<EventEntity>>> = _searchState
 
     fun searchEvents(query: String) {
         if (query.isEmpty()) {
-            _searchState.value = UiState.Success(emptyList())
+            _searchState.value = Result.Success(emptyList())
             return
         }
 
-        _searchState.value = UiState.Loading
+        _searchState.value = Result.Loading
 
         viewModelScope.launch {
             try {
-                val response = ApiConfig.getApiService().searchEvents(active = 0, keyword = query)
-                _searchState.value = UiState.Success(response.listEvents)
+                val response = ApiConfig.getApiService().searchEvents(keyword = query)
+                val searchResults = response.listEvents.map { event ->
+                    EventEntity(
+                        id = event.id ?: 0,
+                        name = event.name ?: "",
+                        summary = event.summary,
+                        mediaCover = event.mediaCover,
+                        imageLogo = event.imageLogo,
+                        description = event.description,
+                        ownerName = event.ownerName,
+                        cityName = event.cityName,
+                        category = event.category,
+                        beginTime = event.beginTime,
+                        endTime = event.endTime,
+                        quota = event.quota,
+                        registrants = event.registrants,
+                        link = event.link,
+                        activeStatus = -1,
+                        isFavorite = false
+                    )
+                }
+                _searchState.value = Result.Success(searchResults)
 
             } catch (e: Exception) {
                 val userMessage = e.toUserFriendlyMessage()
 
-                _searchState.value = UiState.Error(userMessage)
+                _searchState.value = Result.Error(userMessage)
             }
         }
     }
 
     fun clearSearch() {
-        _searchState.value = UiState.Success(emptyList())
+        _searchState.value = Result.Success(emptyList())
     }
 }

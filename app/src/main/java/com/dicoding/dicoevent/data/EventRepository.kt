@@ -107,28 +107,7 @@ class EventRepository private constructor(
                 )
             }
 
-            eventDao.deleteAllNonFavorite(1)
-            eventDao.insertEvents(eventList)
-
-            eventList.forEach { event ->
-                eventDao.updateEvent(
-                    id = event.id,
-                    name = event.name,
-                    summary = event.summary,
-                    mediaCover = event.mediaCover,
-                    imageLogo = event.imageLogo,
-                    description = event.description,
-                    ownerName = event.ownerName,
-                    cityName = event.cityName,
-                    category = event.category,
-                    beginTime = event.beginTime,
-                    endTime = event.endTime,
-                    registrants = event.registrants,
-                    quota = event.quota,
-                    link = event.link,
-                    activeStatus = event.activeStatus
-                )
-            }
+            eventDao.upsertEvents(eventList, activeStatusParam)
         } catch (e: Exception) {
             emit(Result.Error(e.message.toString()))
         }
