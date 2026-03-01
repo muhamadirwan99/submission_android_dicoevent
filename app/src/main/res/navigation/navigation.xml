@@ -56,4 +56,13 @@
             android:id="@+id/action_favoriteFragment_to_detailActivity"
             app:destination="@id/detailActivity" />
     </fragment>
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.dicoding.dicoevent.ui.settings.SettingsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_detailActivity"
+            app:destination="@id/detailActivity" />
+    </fragment>
 </navigation>
