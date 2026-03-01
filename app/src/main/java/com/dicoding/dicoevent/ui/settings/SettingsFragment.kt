@@ -1,17 +1,28 @@
 package com.dicoding.dicoevent.ui.settings
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.dicoding.dicoevent.databinding.FragmentSettingsBinding
 import com.dicoding.dicoevent.ui.ViewModelFactory
 import com.dicoding.dicoevent.utils.DisplayUtils
+import java.util.concurrent.TimeUnit
 
 
 class SettingsFragment : Fragment() {
@@ -20,6 +31,16 @@ class SettingsFragment : Fragment() {
     private val viewModel: SettingsViewModel by viewModels {
         ViewModelFactory.getInstance(requireActivity())
     }
+    private lateinit var workManager: WorkManager
+    private val periodicWorkName = "daily_reminder_event"
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (!isGranted) {
+                Toast.makeText(requireContext(), "Notification permission denied", Toast.LENGTH_SHORT).show()
+                binding.switchDailyReminder.isChecked = false
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +65,12 @@ class SettingsFragment : Fragment() {
             insets
         }
 
+        workManager = WorkManager.getInstance(requireContext())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
         observeViewModel()
     }
 
@@ -66,11 +93,37 @@ class SettingsFragment : Fragment() {
             binding.switchDailyReminder.isChecked = isActive
         }
 
-        // 4. AKSI TOMBOL SWITCH REMINDER
         binding.switchDailyReminder.setOnCheckedChangeListener { _, isChecked ->
             viewModel.saveReminderSetting(isChecked)
-            // TODO: Nanti panggil fungsi WorkManager di sini untuk menyalakan/mematikan alarm
+
+            if (isChecked) {
+                startDailyReminder()
+            } else {
+                cancelDailyReminder()
+            }
         }
+    }
+
+    private fun startDailyReminder() {
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<DailyReminderWorker>(1, TimeUnit.DAYS)
+            .setConstraints(constraints)
+            .setInitialDelay(1, TimeUnit.DAYS)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            periodicWorkName,
+            ExistingPeriodicWorkPolicy.KEEP,
+            periodicWorkRequest
+        )
+    }
+
+    private fun cancelDailyReminder() {
+        workManager.cancelUniqueWork(periodicWorkName)
     }
 
 }

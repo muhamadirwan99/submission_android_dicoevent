@@ -23,11 +23,13 @@ ksp = "2.3.6"
 kotlinParcelize = "2.3.10"
 datastorePreferences = "1.2.0"
 kotlinxCoroutinesCore = "1.10.2"
+workRuntime = "2.11.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationFragmentKtx" }
+androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 html-textview = { module = "com.github.SufficientlySecure:html-textview", version.ref = "htmlTextview" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
