@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.dicoevent.databinding.FragmentFavoriteBinding
 import com.dicoding.dicoevent.ui.ViewModelFactory
 import com.dicoding.dicoevent.ui.adapter.EventVerticalAdapter
-import com.dicoding.dicoevent.ui.finished.FinishedFragmentDirections
 import com.dicoding.dicoevent.utils.DisplayUtils
 import kotlin.getValue
 

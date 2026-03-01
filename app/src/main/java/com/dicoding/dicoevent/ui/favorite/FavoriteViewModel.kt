@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.dicoding.dicoevent.data.EventRepository
 import com.dicoding.dicoevent.data.local.entity.EventEntity
 
-class FavoriteViewModel(private val repository: EventRepository) : ViewModel() {
+class FavoriteViewModel(repository: EventRepository) : ViewModel() {
 
     val favoriteEvents: LiveData<List<EventEntity>> = repository.getFavoriteEvents()
 }

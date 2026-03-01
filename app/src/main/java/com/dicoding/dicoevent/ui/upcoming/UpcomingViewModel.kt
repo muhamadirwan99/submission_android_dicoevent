@@ -11,7 +11,7 @@ import com.dicoding.dicoevent.data.remote.retrofit.ApiConfig
 import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 import kotlinx.coroutines.launch
 
-class UpcomingViewModel(private val repository: EventRepository) : ViewModel() {
+class UpcomingViewModel(repository: EventRepository) : ViewModel() {
 
     val upcomingEvents: LiveData<Result<List<EventEntity>>> = repository.getUpcomingEvents()
     private val _searchState = MutableLiveData<Result<List<EventEntity>>>()

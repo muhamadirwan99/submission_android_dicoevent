@@ -18,7 +18,7 @@ interface EventDao {
     @Query("SELECT * FROM event_table WHERE id = :id")
     fun getEventDetail(id: Int): LiveData<EventEntity>
 
-    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertEvents(events: List<EventEntity>)
 
     @Query(

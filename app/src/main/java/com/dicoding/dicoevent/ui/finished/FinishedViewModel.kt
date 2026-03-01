@@ -11,7 +11,7 @@ import com.dicoding.dicoevent.data.remote.retrofit.ApiConfig
 import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 import kotlinx.coroutines.launch
 
-class FinishedViewModel(private val repository: EventRepository) : ViewModel() {
+class FinishedViewModel(repository: EventRepository) : ViewModel() {
 
     val finishedEvents: LiveData<Result<List<EventEntity>>> = repository.getFinishedEvents()
     private val _searchState = MutableLiveData<Result<List<EventEntity>>>()

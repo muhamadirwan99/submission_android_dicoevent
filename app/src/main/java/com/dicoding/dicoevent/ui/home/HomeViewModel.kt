@@ -12,7 +12,7 @@ import com.dicoding.dicoevent.data.remote.retrofit.ApiConfig
 import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val repository: EventRepository) : ViewModel() {
+class HomeViewModel(repository: EventRepository) : ViewModel() {
 
     val upcomingEvents: LiveData<Result<List<EventEntity>>> = repository.getUpcomingEvents().map { result ->
         if (result is Result.Success) {
