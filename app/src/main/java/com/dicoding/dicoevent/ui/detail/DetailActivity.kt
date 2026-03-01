@@ -3,6 +3,7 @@ package com.dicoding.dicoevent.ui.detail
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -55,11 +56,22 @@ class DetailActivity : AppCompatActivity() {
                 layoutContent.root.isVisible = result is Result.Success
                 layoutError.layoutError.isVisible = result is Result.Error
                 actionRegister.isVisible = result is Result.Success
+                actionFavorite.isVisible = result is Result.Success
 
                 when (result) {
                     is Result.Success -> {
                         actionRegister.setOnClickListener {
                             openUrl(result.data.link)
+                        }
+                        actionFavorite.setOnClickListener {
+                            val newState = !result.data.isFavorite
+                            detailViewModel.setFavoriteEvent(eventId, newState)
+                        }
+
+                        if (result.data.isFavorite) {
+                            binding.actionFavorite.setImageResource(R.drawable.baseline_favorite_24)
+                        } else {
+                            binding.actionFavorite.setImageResource(R.drawable.baseline_favorite_border_24)
                         }
 
                         bindDataDetail(result.data)

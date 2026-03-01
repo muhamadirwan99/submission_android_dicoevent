@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.dicoding.dicoevent.data.EventRepository
 import com.dicoding.dicoevent.di.Injection
 import com.dicoding.dicoevent.ui.detail.DetailViewModel
+import com.dicoding.dicoevent.ui.favorite.FavoriteViewModel
 import com.dicoding.dicoevent.ui.finished.FinishedViewModel
 import com.dicoding.dicoevent.ui.home.HomeViewModel
 import com.dicoding.dicoevent.ui.upcoming.UpcomingViewModel
@@ -29,9 +30,9 @@ class ViewModelFactory private constructor(private val eventRepository: EventRep
             modelClass.isAssignableFrom(DetailViewModel::class.java) -> {
                 DetailViewModel(eventRepository) as T
             }
-//            modelClass.isAssignableFrom(FavoriteViewModel::class.java) -> {
-//                FavoriteViewModel(eventRepository) as T
-//            }
+            modelClass.isAssignableFrom(FavoriteViewModel::class.java) -> {
+                FavoriteViewModel(eventRepository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
         }
 

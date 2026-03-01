@@ -37,7 +37,7 @@
     <activity
         android:id="@+id/detailActivity"
         android:name="com.dicoding.dicoevent.ui.detail.DetailActivity"
-        android:label="activity_detail"
+        android:label="Detail Event"
         tools:layout="@layout/activity_detail">
         <argument
             android:name="eventId"
@@ -48,4 +48,12 @@
             app:argType="boolean"
             android:defaultValue="true" />
     </activity>
+    <fragment
+        android:id="@+id/navigation_favorite"
+        android:name="com.dicoding.dicoevent.ui.favorite.FavoriteFragment"
+        android:label="@string/favorite" >
+        <action
+            android:id="@+id/action_favoriteFragment_to_detailActivity"
+            app:destination="@id/detailActivity" />
+    </fragment>
 </navigation>
