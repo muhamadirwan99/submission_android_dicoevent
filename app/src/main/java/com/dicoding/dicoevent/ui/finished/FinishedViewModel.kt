@@ -3,6 +3,7 @@ package com.dicoding.dicoevent.ui.finished
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.dicoding.dicoevent.data.EventRepository
 import com.dicoding.dicoevent.data.Result
@@ -13,7 +14,20 @@ import kotlinx.coroutines.launch
 
 class FinishedViewModel(repository: EventRepository) : ViewModel() {
 
-    val finishedEvents: LiveData<Result<List<EventEntity>>> = repository.getFinishedEvents()
+    private val _refreshTrigger = MutableLiveData<Unit>()
+
+    val finishedEvents: LiveData<Result<List<EventEntity>>> = _refreshTrigger.switchMap {
+        repository.getFinishedEvents()
+    }
+
+    init {
+        refresh()
+    }
+
+    fun refresh() {
+        _refreshTrigger.value = Unit
+    }
+
     private val _searchState = MutableLiveData<Result<List<EventEntity>>>()
     val searchState: LiveData<Result<List<EventEntity>>> = _searchState
 

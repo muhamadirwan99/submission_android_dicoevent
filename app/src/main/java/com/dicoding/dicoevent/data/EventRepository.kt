@@ -6,6 +6,7 @@ import androidx.lifecycle.map
 import com.dicoding.dicoevent.data.local.room.EventDao
 import com.dicoding.dicoevent.data.local.entity.EventEntity
 import com.dicoding.dicoevent.data.remote.retrofit.ApiService
+import com.dicoding.dicoevent.utils.toUserFriendlyMessage
 
 class EventRepository private constructor(
     private val apiService: ApiService,
@@ -65,7 +66,9 @@ class EventRepository private constructor(
                 )
             }
         } catch (e: Exception) {
-            emit(Result.Error(e.message.toString()))
+            val errorMessage = e.toUserFriendlyMessage()
+
+            emit(Result.Error(errorMessage))
         }
 
         val localData: LiveData<Result<EventEntity>> = eventDao.getEventDetail(id).map { Result.Success(it) }
@@ -109,7 +112,14 @@ class EventRepository private constructor(
 
             eventDao.upsertEvents(eventList, activeStatusParam)
         } catch (e: Exception) {
-            emit(Result.Error(e.message.toString()))
+            val localData = eventDao.getEventsSync(activeStatusParam)
+
+            if (localData.isEmpty()) {
+                val errorMessage = e.toUserFriendlyMessage()
+
+                emit(Result.Error(errorMessage))
+                return@liveData
+            }
         }
 
         val localData: LiveData<Result<List<EventEntity>>> =

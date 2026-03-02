@@ -3,6 +3,7 @@ package com.dicoding.dicoevent.ui.upcoming
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.dicoding.dicoevent.data.EventRepository
 import com.dicoding.dicoevent.data.Result
@@ -13,7 +14,20 @@ import kotlinx.coroutines.launch
 
 class UpcomingViewModel(repository: EventRepository) : ViewModel() {
 
-    val upcomingEvents: LiveData<Result<List<EventEntity>>> = repository.getUpcomingEvents()
+    private val _refreshTrigger = MutableLiveData<Unit>()
+
+    val upcomingEvents: LiveData<Result<List<EventEntity>>> = _refreshTrigger.switchMap {
+        repository.getUpcomingEvents()
+    }
+
+    init {
+        refresh()
+    }
+
+    fun refresh() {
+        _refreshTrigger.value = Unit
+    }
+
     private val _searchState = MutableLiveData<Result<List<EventEntity>>>()
     val searchState: LiveData<Result<List<EventEntity>>> = _searchState
 

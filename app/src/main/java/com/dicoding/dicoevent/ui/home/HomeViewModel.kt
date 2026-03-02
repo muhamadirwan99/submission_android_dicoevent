@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.dicoding.dicoevent.data.EventRepository
 import com.dicoding.dicoevent.data.local.entity.EventEntity
@@ -14,20 +15,34 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(repository: EventRepository) : ViewModel() {
 
-    val upcomingEvents: LiveData<Result<List<EventEntity>>> = repository.getUpcomingEvents().map { result ->
-        if (result is Result.Success) {
-            Result.Success(result.data.take(5))
-        } else {
-            result
+    private val _refreshTrigger = MutableLiveData<Unit>()
+
+    val upcomingEvents: LiveData<Result<List<EventEntity>>> = _refreshTrigger.switchMap {
+        repository.getUpcomingEvents().map { result ->
+            if (result is Result.Success) {
+                Result.Success(result.data.take(5))
+            } else {
+                result
+            }
         }
     }
 
-    val finishedEvents: LiveData<Result<List<EventEntity>>> = repository.getFinishedEvents().map { result ->
-        if (result is Result.Success) {
-            Result.Success(result.data.take(5))
-        } else {
-            result
+    val finishedEvents: LiveData<Result<List<EventEntity>>> = _refreshTrigger.switchMap {
+        repository.getFinishedEvents().map { result ->
+            if (result is Result.Success) {
+                Result.Success(result.data.take(5))
+            } else {
+                result
+            }
         }
+    }
+
+    init {
+        refresh()
+    }
+
+    fun refresh() {
+        _refreshTrigger.value = Unit
     }
 
     private val _searchState = MutableLiveData<Result<List<EventEntity>>>()

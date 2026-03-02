@@ -12,6 +12,9 @@ interface EventDao {
     @Query("SELECT * FROM event_table WHERE activeStatus = :activeStatus")
     fun getEvents(activeStatus: Int): LiveData<List<EventEntity>>
 
+    @Query("SELECT * FROM event_table WHERE activeStatus = :activeStatus")
+    suspend fun getEventsSync(activeStatus: Int): List<EventEntity>
+
     @Query("SELECT * FROM event_table WHERE isFavorite = 1")
     fun getFavoriteEvents(): LiveData<List<EventEntity>>
 

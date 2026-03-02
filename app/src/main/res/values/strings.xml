@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">DicoEvent</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="home">Home</string>
     <string name="upcoming">Upcoming</string>
     <string name="finished">Finished</string>
@@ -36,4 +35,6 @@
     <string name="enable_notification">Enable notification</string>
     <string name="event_completed">EVENT COMPLETED</string>
     <string name="failed_to_load_data">Failed to load data</string>
+    <string name="error_icon">Error Icon</string>
+    <string name="retry">Retry</string>
 </resources>

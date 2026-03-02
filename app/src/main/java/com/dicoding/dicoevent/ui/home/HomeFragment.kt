@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
-    private val homeViewModel : HomeViewModel by viewModels {
+    private val homeViewModel: HomeViewModel by viewModels {
         ViewModelFactory.getInstance(requireActivity())
     }
     private lateinit var finishedAdapter: EventVerticalAdapter
@@ -60,10 +60,19 @@ class HomeFragment : Fragment() {
         setupSearch()
 
         val layoutFinishedManager = LinearLayoutManager(requireContext())
-        binding.rvFinishedEvents.layoutManager = layoutFinishedManager
 
         val layoutUpcomingManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvUpcomingEvents.layoutManager = layoutUpcomingManager
+
+        with(binding) {
+            rvFinishedEvents.layoutManager = layoutFinishedManager
+            rvUpcomingEvents.layoutManager = layoutUpcomingManager
+            layoutErrorFinished.btnRetry.setOnClickListener {
+                homeViewModel.refresh()
+            }
+            layoutErrorUpcoming.btnRetry.setOnClickListener {
+                homeViewModel.refresh()
+            }
+        }
     }
 
     private fun setupRecyclerViews() {

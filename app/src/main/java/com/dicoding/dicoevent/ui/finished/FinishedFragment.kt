@@ -59,7 +59,12 @@ class FinishedFragment : Fragment() {
         setupSearch()
 
         val layoutFinishedManager = LinearLayoutManager(requireContext())
-        binding.rvFinishedEvents.layoutManager = layoutFinishedManager
+        with(binding) {
+            rvFinishedEvents.layoutManager = layoutFinishedManager
+            layoutError.btnRetry.setOnClickListener {
+                viewModel.refresh()
+            }
+        }
     }
 
     private fun setupRecyclerViews() {

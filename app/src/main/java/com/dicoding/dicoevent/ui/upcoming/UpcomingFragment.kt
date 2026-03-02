@@ -1,7 +1,6 @@
 package com.dicoding.dicoevent.ui.upcoming
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -31,7 +30,7 @@ import kotlin.getValue
 class UpcomingFragment : Fragment() {
 
     private lateinit var binding: FragmentUpcomingBinding
-    private val viewModel : UpcomingViewModel by viewModels {
+    private val viewModel: UpcomingViewModel by viewModels {
         ViewModelFactory.getInstance(requireActivity())
     }
     private lateinit var upcomingAdapter: EventHorizontalAdapter
@@ -61,7 +60,13 @@ class UpcomingFragment : Fragment() {
         setupSearch()
 
         val layoutFinishedManager = LinearLayoutManager(requireContext())
-        binding.rvUpcomingEvents.layoutManager = layoutFinishedManager
+        with(binding) {
+            rvUpcomingEvents.layoutManager = layoutFinishedManager
+            layoutError.btnRetry.setOnClickListener {
+                viewModel.refresh()
+            }
+        }
+
     }
 
     private fun setupRecyclerViews() {
@@ -103,6 +108,7 @@ class UpcomingFragment : Fragment() {
 
                     is Result.Error -> {
                         layoutError.tvErrorMessage.text = result.error
+
                     }
 
                     else -> {}
