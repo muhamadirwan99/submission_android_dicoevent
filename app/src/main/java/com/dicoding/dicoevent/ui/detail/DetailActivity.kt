@@ -55,7 +55,7 @@ class DetailActivity : AppCompatActivity() {
             with(binding) {
                 shimmerLoading.shimmerViewDetail.isVisible = result is Result.Loading
                 layoutContent.root.isVisible = result is Result.Success
-                layoutError.layoutError.isVisible = result is Result.Error
+                layoutError.tvErrorMessage.isVisible = result is Result.Error
                 actionRegister.isVisible = result is Result.Success
                 actionFavorite.isVisible = result is Result.Success
 

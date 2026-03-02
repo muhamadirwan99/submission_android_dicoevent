@@ -35,7 +35,7 @@
             android:textStyle="bold"
             android:visibility="gone"
             app:drawableTint="?attr/colorPrimary"
-            app:drawableTopCompat="@drawable/ic_launcher_foreground"
+            app:drawableTopCompat="@drawable/foreground_android"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
