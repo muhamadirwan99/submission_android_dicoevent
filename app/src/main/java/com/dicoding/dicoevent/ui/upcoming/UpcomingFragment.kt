@@ -147,7 +147,6 @@ class UpcomingFragment : Fragment() {
                 .distinctUntilChanged()
                 .filter { it.isNotEmpty() }
                 .collect { query ->
-                    Log.d("Search", "Mencari: $query")
                     viewModel.searchEvents(query)
                 }
         }
